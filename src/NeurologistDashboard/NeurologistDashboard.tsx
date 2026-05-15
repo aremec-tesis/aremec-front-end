@@ -353,7 +353,7 @@ const CSS = `
   .three-col { display:grid; grid-template-columns:2fr 1fr; gap:20px; }
 
   /* ── SESSION DETAIL ── */
-  .session-row { display:flex; gap:14px; align-items:center; padding:14px 16px; border-radius:10px; background:var(--surface); border:1px solid var(--border); cursor:pointer; transition:all .2s; }
+  .session-row { display:flex; gap:14px; align-items:center; padding:14px 16px; border-radius:10px; background:var(--surface4); border:1px solid var(--border); cursor:pointer; transition:all .2s; }
   .session-row:hover { border-color:var(--accent2); }
   .session-date { font-size:11px; font-family:var(--mono); color:var(--text2); min-width:90px; }
   .session-info { flex:1; }
