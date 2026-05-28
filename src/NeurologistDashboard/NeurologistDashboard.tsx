@@ -166,7 +166,7 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
                     <>
                         <div className="login-form">
                             <div className="input-group">
-                                <label className="input-label">CORREO INSTITUCIONAL</label>
+                                <label className="input-label">CORREO</label>
                                 <input className="input" type="email" placeholder="nombre@incn.gob.pe" value={email} onChange={e => setEmail(e.target.value)} />
                             </div>
                             <div className="input-group">
