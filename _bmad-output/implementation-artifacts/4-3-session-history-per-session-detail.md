@@ -4,7 +4,7 @@ baseline_commit: 3e5c4fab881da839d27dec8ad1049dfe47c13f2d
 
 # Story 4.3: Session History & Per-Session Detail
 
-Status: review
+Status: done
 
 ## Story
 
@@ -91,8 +91,8 @@ so that I can review the complete metric history and inform adaptive therapy dec
 
 ### Review Findings
 
-- [ ] [Review][Patch] `data.levels` null access crashes MetricDetailTable when API returns `null` for levels field [src/features/analytics/components/MetricDetailTable.tsx:33]
-- [ ] [Review][Patch] `navigate(-1)` exits app entirely when SessionDetailPage accessed via direct URL or bookmark [src/features/sessions/pages/SessionDetailPage.tsx:10]
+- [x] [Review][Patch] `data.levels` null access crashes MetricDetailTable when API returns `null` for levels field [src/features/analytics/components/MetricDetailTable.tsx:33]
+- [x] [Review][Patch] `navigate(-1)` exits app entirely when SessionDetailPage accessed via direct URL or bookmark [src/features/sessions/pages/SessionDetailPage.tsx:10]
 - [x] [Review][Defer] Status coercion maps any non-'complete' API value silently to 'incomplete' — deferred, by spec design; revisit if API adds new statuses [src/services/patients.service.ts]
 - [x] [Review][Defer] Date-only ISO strings parse as UTC midnight, display previous day at UTC-5 — deferred, same class as 4.1/4.2 [src/features/analytics/components/SessionHistory.tsx]
 - [x] [Review][Defer] Invalid `sessionDate` string crashes entire session list render — deferred, same class as 4.1/4.2 [src/features/analytics/components/SessionHistory.tsx]

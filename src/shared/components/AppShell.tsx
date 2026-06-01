@@ -6,7 +6,7 @@ import { LogoutButton } from '../../features/auth/components/LogoutButton'
 
 export default function AppShell() {
   const neurologist = useAppStore((s) => s.auth.neurologist)
-  const initials = neurologist?.name
+  const initials = neurologist?.name?.trim()
     ? neurologist.name.split(' ').filter(Boolean).map((n) => n[0]).join('').slice(0, 2).toUpperCase()
     : '?'
 

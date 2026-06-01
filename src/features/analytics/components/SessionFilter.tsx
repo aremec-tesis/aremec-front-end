@@ -1,4 +1,5 @@
 import { usePatientDashboard } from '../hooks/usePatientDashboard'
+import { formatDate } from '../../../shared/utils/format'
 
 type Props = {
   patientId: string
@@ -27,8 +28,7 @@ export function SessionFilter({ patientId, selectedSessionId, onSelect }: Props)
             className={`btn btn-sm ${selectedSessionId === s.sessionId ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => onSelect(s.sessionId)}
           >
-            {new Intl.DateTimeFormat('es-PE', { dateStyle: 'short' })
-              .format(new Date(s.sessionDate))}
+            {formatDate(s.sessionDate, { dateStyle: 'short' })}
           </button>
         ))}
       </div>

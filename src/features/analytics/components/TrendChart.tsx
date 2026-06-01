@@ -6,6 +6,7 @@ import { usePatientTrend } from '../hooks/usePatientTrend'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
 import { EmptyState } from '../../../shared/components/EmptyState'
+import { formatNumber, formatDate } from '../../../shared/utils/format'
 
 type Props = { patientId: string }
 
@@ -25,8 +26,7 @@ export function TrendChart({ patientId }: Props) {
   }
 
   const chartData = data.sessions.map(s => ({
-    label: new Intl.DateTimeFormat('es-PE', { month: 'short', day: 'numeric' })
-      .format(new Date(s.sessionDate)),
+    label: formatDate(s.sessionDate, { month: 'short', day: 'numeric' }),
     sps: s.sps,
   }))
 
@@ -36,7 +36,7 @@ export function TrendChart({ patientId }: Props) {
         <div className="card-label">EVOLUCIÓN SPS</div>
         <div style={{ fontSize: 12, color: 'var(--text2)', display: 'flex', gap: 16 }}>
           <span>{TREND_LABEL[data.trend] ?? 'Tendencia desconocida'}</span>
-          <span>Pendiente: {data.slope.toFixed(2)}</span>
+          <span>Pendiente: {formatNumber(data.slope, 2)}</span>
         </div>
       </div>
       <ResponsiveContainer width="100%" height={220}>

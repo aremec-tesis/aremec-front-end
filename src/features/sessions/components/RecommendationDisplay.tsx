@@ -28,9 +28,9 @@ export function RecommendationDisplay({ recommendation }: Props) {
       field={recommendation}
       render={(value) => (
         <span
-          className={`badge recommendation-badge ${RECOMMENDATION_BADGE[value]}`}
+          className={`badge recommendation-badge ${RECOMMENDATION_BADGE[value] ?? 'badge-gray'}`}
         >
-          {RECOMMENDATION_LABEL[value]}
+          {RECOMMENDATION_LABEL[value] ?? value}
         </span>
       )}
     />

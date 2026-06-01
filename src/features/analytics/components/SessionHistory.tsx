@@ -1,8 +1,10 @@
+import type React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSessionHistory } from '../hooks/useSessionHistory'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
 import { EmptyState } from '../../../shared/components/EmptyState'
+import { formatNumber, formatDate } from '../../../shared/utils/format'
 
 type Props = { patientId: string }
 
@@ -10,6 +12,15 @@ const RECOMMENDATION_LABEL: Record<string, string> = {
   increase_difficulty: 'Aumentar dificultad',
   maintain_difficulty: 'Mantener dificultad',
   decrease_difficulty: 'Reducir dificultad',
+}
+
+const SESSION_ROW_STYLE: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '1.5fr 1fr 1fr 2fr auto',
+  gap: 12,
+  padding: '10px 0',
+  borderBottom: '1px solid var(--border)',
+  cursor: 'pointer',
 }
 
 export function SessionHistory({ patientId }: Props) {
@@ -28,22 +39,22 @@ export function SessionHistory({ patientId }: Props) {
       {data.map(session => (
         <div
           key={session.sessionId}
-          onClick={() => navigate(`/sessions/${session.sessionId}`)}
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1.5fr 1fr 1fr 2fr auto',
-            gap: 12,
-            padding: '10px 0',
-            borderBottom: '1px solid var(--border)',
-            cursor: 'pointer',
+          role="button"
+          tabIndex={0}
+          onClick={() => navigate(`/sessions/${session.sessionId}`, { state: { patientId } })}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              navigate(`/sessions/${session.sessionId}`, { state: { patientId } })
+            }
           }}
+          style={SESSION_ROW_STYLE}
         >
           <div style={{ fontSize: 13 }}>
-            {new Intl.DateTimeFormat('es-PE', { dateStyle: 'medium' })
-              .format(new Date(session.sessionDate))}
+            {formatDate(session.sessionDate, { dateStyle: 'medium' })}
           </div>
           <div style={{ fontSize: 13, fontFamily: 'var(--font-mono, monospace)' }}>
-            SPS {session.sps.toFixed(1)}
+            SPS {formatNumber(session.sps, 1)}
           </div>
           <div style={{ fontSize: 12, color: 'var(--text2)' }}>
             {session.spsClass ?? '—'}

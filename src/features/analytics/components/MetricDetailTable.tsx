@@ -30,7 +30,7 @@ export function MetricDetailTable({ sessionId }: Props) {
 
   if (isPending) return <LoadingSpinner />
   if (error) return <ErrorMessage error={error} />
-  if (!data || data.levels.length === 0) {
+  if (!data?.levels?.length) {
     return <EmptyState message="Sin datos de métricas para esta sesión" />
   }
 

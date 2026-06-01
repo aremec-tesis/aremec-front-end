@@ -28,6 +28,21 @@ function toMLField<T>(value: T | null): MLField<T> {
   return value === null ? { status: 'pending' } : { status: 'resolved', value }
 }
 
+const RECOMMENDATION_VALUES = [
+  'increase_difficulty',
+  'maintain_difficulty',
+  'decrease_difficulty',
+] as const
+type RecommendationValue = (typeof RECOMMENDATION_VALUES)[number]
+
+function toRecommendationField(
+  raw: string | null,
+): MLField<RecommendationValue> {
+  return raw != null && (RECOMMENDATION_VALUES as readonly string[]).includes(raw)
+    ? { status: 'resolved', value: raw as RecommendationValue }
+    : { status: 'pending' }
+}
+
 function toLevelMetrics(raw: LevelMetricsRaw): LevelMetrics {
   return {
     level: raw.level,
@@ -38,13 +53,7 @@ function toLevelMetrics(raw: LevelMetricsRaw): LevelMetrics {
     er: raw.er,
     sps: raw.sps,
     spsClass: toMLField(raw.sps_class),
-    recommendation: toMLField(
-      raw.recommendation as
-        | 'increase_difficulty'
-        | 'maintain_difficulty'
-        | 'decrease_difficulty'
-        | null
-    ),
+    recommendation: toRecommendationField(raw.recommendation),
     cognitiveDomainTags: raw.cognitive_domain_tags,
   }
 }

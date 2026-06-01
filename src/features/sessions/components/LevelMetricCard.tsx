@@ -1,6 +1,7 @@
 import type { MLField } from '../session.types'
 import { DomainTag } from './DomainTag'
 import { MLFieldDisplay } from './MLFieldDisplay'
+import { formatNumber } from '../../../shared/utils/format'
 
 type Props = {
   label: string
@@ -12,7 +13,7 @@ type Props = {
 export function LevelMetricCard({ label, value, domain, spsClass }: Props) {
   return (
     <div className="metric-item">
-      <div className="metric-val">{value.toFixed(2)}</div>
+      <div className="metric-val">{formatNumber(value, 2)}</div>
       <div className="metric-abbr">{label}</div>
       <div className="metric-domain">
         <DomainTag domain={domain} />

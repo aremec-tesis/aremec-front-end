@@ -47,7 +47,7 @@ export const useAppStore = create<AppStore>((set) => ({
   setNotifications: (patch) =>
     set((s) => ({ notifications: { ...s.notifications, ...patch } })),
   resetActiveSession: () =>
-    set(() => ({
+    set((s) => ({
       activeSession: {
         sessionId: null,
         patientId: null,
@@ -55,5 +55,6 @@ export const useAppStore = create<AppStore>((set) => ({
         currentLevel: null,
         wsStatus: 'disconnected',
       },
+      notifications: { ...s.notifications, pendingSessionComplete: false },
     })),
 }))

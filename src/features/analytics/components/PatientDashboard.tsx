@@ -1,3 +1,4 @@
+import type React from 'react'
 import {
   LineChart, Line, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid,
@@ -6,6 +7,7 @@ import { usePatientDashboard } from '../hooks/usePatientDashboard'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
 import { EmptyState } from '../../../shared/components/EmptyState'
+import { formatNumber, formatDate } from '../../../shared/utils/format'
 
 type Props = { patientId: string; selectedSessionId?: string | null }
 
@@ -31,6 +33,28 @@ function formatRecommendation(value: string | null): string {
   return RECOMMENDATION_LABEL[value] ?? value
 }
 
+const DASHBOARD_CONTAINER_STYLE: React.CSSProperties = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 16,
+}
+
+const HEADER_ROW_STYLE: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  marginBottom: 12,
+  gap: 12,
+}
+
+const SESSION_ROW_STYLE: React.CSSProperties = {
+  display: 'grid',
+  gridTemplateColumns: '1.5fr 1fr 1fr 2fr',
+  gap: 12,
+  padding: '10px 0',
+  borderBottom: '1px solid var(--border)',
+}
+
 export function PatientDashboard({ patientId, selectedSessionId }: Props) {
   const { data, isPending, error } = usePatientDashboard(patientId)
 
@@ -49,23 +73,14 @@ export function PatientDashboard({ patientId, selectedSessionId }: Props) {
   const displayedSessions = filteredSessions.length > 0 ? filteredSessions : data.sessions
 
   const chartData = displayedSessions.map(s => ({
-    label: new Intl.DateTimeFormat('es-PE', { month: 'short', day: 'numeric' })
-      .format(new Date(s.sessionDate)),
+    label: formatDate(s.sessionDate, { month: 'short', day: 'numeric' }),
     sps: s.sps,
   }))
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div style={DASHBOARD_CONTAINER_STYLE}>
       <div className="card">
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: 12,
-            gap: 12,
-          }}
-        >
+        <div style={HEADER_ROW_STYLE}>
           <div className="card-label">TENDENCIA SPS</div>
           <span className={`badge ${trend.className}`} style={trend.badgeStyle}>{trend.label}</span>
         </div>
@@ -92,19 +107,13 @@ export function PatientDashboard({ patientId, selectedSessionId }: Props) {
         {displayedSessions.map(session => (
           <div
             key={session.sessionId}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1.5fr 1fr 1fr 2fr',
-              gap: 12,
-              padding: '10px 0',
-              borderBottom: '1px solid var(--border)',
-            }}
+            style={SESSION_ROW_STYLE}
           >
             <div style={{ fontSize: 13 }}>
-              {new Intl.DateTimeFormat('es-PE', { dateStyle: 'medium' }).format(new Date(session.sessionDate))}
+              {formatDate(session.sessionDate, { dateStyle: 'medium' })}
             </div>
             <div style={{ fontSize: 13, fontFamily: 'var(--font-mono, monospace)' }}>
-              SPS {session.sps.toFixed(1)}
+              SPS {formatNumber(session.sps, 1)}
             </div>
             <div style={{ fontSize: 12, color: 'var(--text2)' }}>
               {session.spsClass ?? '—'}

@@ -22,7 +22,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     if (window.location.pathname !== '/login') {
       window.location.href = '/login'
     }
-    return undefined as never
+    throw new ApiError(401, 'UNAUTHORIZED', 'Session expired or absent')
   }
 
   if (!res.ok) {
@@ -34,8 +34,16 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     )
   }
 
+  if (res.status === 204) return undefined as T
   const ct = res.headers.get('content-type')
-  return (ct?.includes('application/json') ? res.json() : Promise.resolve(undefined)) as Promise<T>
+  if (ct?.includes('application/json')) return res.json() as Promise<T>
+  const text = await res.text().catch(() => '')
+  if (text.trim() === '') return undefined as T
+  throw new ApiError(
+    res.status,
+    'NON_JSON_RESPONSE',
+    `Expected JSON, received '${ct ?? 'unknown content-type'}'`
+  )
 }
 
 export const api = {

@@ -11,6 +11,7 @@ type Props = {
 export function SessionOpenButton({ patientId }: Props) {
   const navigate = useNavigate()
   const setActiveSession = useAppStore((s) => s.setActiveSession)
+  const active = useAppStore((s) => s.activeSession)
 
   const { mutate, isPending, error } = useMutation({
     mutationFn: () => createSession(patientId),
@@ -30,9 +31,15 @@ export function SessionOpenButton({ patientId }: Props) {
       <button
         className="btn btn-primary"
         disabled={isPending}
-        onClick={() => mutate()}
+        onClick={() => {
+          if (active.sessionId) {
+            navigate(`/patients/${active.patientId ?? patientId}/session`)
+            return
+          }
+          mutate()
+        }}
       >
-        {isPending ? 'Iniciando...' : 'Iniciar sesión'}
+        {active.sessionId ? 'Ver sesión activa' : isPending ? 'Iniciando...' : 'Iniciar sesión'}
       </button>
       {error && <ErrorMessage error={error} />}
     </>
