@@ -49,8 +49,30 @@ export default function PatientProfilePage() {
   return (
     <div className="page">
       {error && <ErrorMessage error={error} />}
-      <div className="section-header">
-        <h1 className="page-title">{patient.name}</h1>
+
+      <div className="card" style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div className="patient-avatar" style={{ width: 56, height: 56, fontSize: 20 }}>
+            {patient.name?.trim()
+              ? patient.name.split(' ').filter(Boolean).map((n) => n[0]).join('').slice(0, 2).toUpperCase()
+              : '?'}
+          </div>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 20, fontWeight: 800 }}>{patient.name}</div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 6, flexWrap: 'wrap' }}>
+              <span style={{ fontSize: 12, color: 'var(--text2)', fontFamily: 'var(--mono)' }}>
+                {patient.age} años
+              </span>
+              <span style={{ fontSize: 12, color: 'var(--text2)', fontFamily: 'var(--mono)' }}>·</span>
+              <span style={{ fontSize: 12, color: 'var(--text2)' }}>
+                {DIAGNOSIS_LABEL[patient.diagnosis] ?? patient.diagnosis}
+              </span>
+              <span className={`badge ${patient.status === 'active' ? 'badge-green' : 'badge-gray'}`}>
+                {patient.status === 'active' ? 'Activo' : 'Inactivo'}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="tabs">

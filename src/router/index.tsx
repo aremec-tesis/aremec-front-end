@@ -8,6 +8,7 @@ import PatientListPage from '../features/patients/pages/PatientListPage'
 import PatientProfilePage from '../features/patients/pages/PatientProfilePage'
 import SessionMonitorPage from '../features/sessions/pages/SessionMonitorPage'
 import SessionDetailPage from '../features/sessions/pages/SessionDetailPage'
+import SessionHistoryPage from '../features/sessions/pages/SessionHistoryPage'
 
 let authCheckInFlight: Promise<Response | null> | null = null
 
@@ -63,6 +64,7 @@ const router = createBrowserRouter([
       { path: 'patients/new', element: <PatientRegistrationPage /> },
       { path: 'patients/:id', element: <PatientProfilePage /> },
       { path: 'patients/:id/session', element: <SessionMonitorPage /> },
+      { path: 'sessions/history', element: <SessionHistoryPage /> },
       { path: 'sessions/:id', element: <SessionDetailPage /> },
     ],
   },

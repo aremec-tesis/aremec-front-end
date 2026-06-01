@@ -14,16 +14,13 @@ export default function SessionDetailPage() {
 
   return (
     <div className="page">
-      <div className="section-header">
-        <button
-          onClick={() => navigate(backPath)}
-          className="btn btn-secondary btn-sm"
-          style={{ marginBottom: 12 }}
-        >
-          ← Volver
-        </button>
-        <h1 className="page-title">Detalle de sesión</h1>
-      </div>
+      <button
+        onClick={() => navigate(backPath)}
+        className="btn btn-ghost btn-sm"
+        style={{ marginBottom: 16 }}
+      >
+        ← Volver
+      </button>
       <MetricDetailTable sessionId={id} />
     </div>
   )

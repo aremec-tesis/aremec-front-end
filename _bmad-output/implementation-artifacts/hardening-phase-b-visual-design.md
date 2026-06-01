@@ -4,7 +4,7 @@ baseline_commit: 6a32fea776fdf42a2467b896175f6a9a0d5760c4
 
 # Hardening Phase B: Visual Design & Polish
 
-Status: review
+Status: done
 
 ## Story
 
@@ -318,9 +318,15 @@ claude-opus-4-8 (Claude Code, bmad-dev-story workflow)
 - `src/features/analytics/components/SessionHistory.tsx` — keyboard nav + `SESSION_ROW_STYLE` const (B3, B4)
 - `src/features/analytics/components/PatientDashboard.tsx` — module-level style consts (B4)
 
+### Review Findings
+
+- [x] [Review][Defer] `[role="button"]:focus-visible` selector is globally scoped — any future third-party component with `role="button"` inherits this focus outline; a scoped class would be safer [src/index.css:1257] — deferred, spec-prescribed implementation; only current usage is session rows
+- [x] [Review][Defer] `PatientDashboard` session rows have no keyboard interaction despite receiving `SESSION_ROW_STYLE` — B3 AC text scopes to "session history list" (`SessionHistory.tsx`); PatientDashboard rows are read-only (no navigate on click) [src/features/analytics/components/PatientDashboard.tsx:107] — deferred, out of B3 scope per spec; rows are not interactive by design
+
 ## Change Log
 
 | Date | Change |
 |------|--------|
 | 2026-06-01 | Story created — Hardening Phase B visual design: spinner animation, initials guard, keyboard navigation, style object stability. Status → ready-for-dev. |
 | 2026-06-01 | Implemented B1–B4 + focus-visible CSS. Build green (0 TS errors). Status → review. |
+| 2026-06-01 | Code review complete. 2 deferred findings written above. Status → done. |

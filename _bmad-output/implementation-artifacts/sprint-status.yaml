@@ -35,7 +35,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 
 generated: "2026-05-28"
-last_updated: "2026-06-01"
+last_updated: "2026-06-01 (post-review)"
 project: aremec-front-end
 project_key: NOKEY
 tracking_system: file-system
@@ -75,4 +75,5 @@ development_status:
   hardening-sprint: in-progress
   hardening-phase-a-critical-fixes: done
   hardening-phase-a2-data-correctness: done
-  hardening-phase-b-visual-design: review
+  hardening-phase-b-visual-design: done
+  hardening-phase-c-visual-redesign: done

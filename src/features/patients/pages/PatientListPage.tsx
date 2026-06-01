@@ -24,13 +24,6 @@ export default function PatientListPage() {
 
   return (
     <div className="page">
-      <div className="section-header">
-        <div className="page-title">Pacientes</div>
-        <button className="btn btn-primary" onClick={() => navigate('/patients/new')}>
-          + Nuevo paciente
-        </button>
-      </div>
-
       <div className="search-row">
         <div className="search-wrap">
           <span className="search-icon">🔍</span>
@@ -56,6 +49,9 @@ export default function PatientListPage() {
           <option value="active">Activo</option>
           <option value="inactive">Inactivo</option>
         </select>
+        <button className="btn btn-primary" onClick={() => navigate('/patients/new')}>
+          + Nuevo paciente
+        </button>
       </div>
 
       <PatientList patients={data} isPending={isPending} error={error} />

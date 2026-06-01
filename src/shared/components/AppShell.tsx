@@ -2,10 +2,11 @@ import { NavLink, Outlet } from 'react-router-dom'
 import { useAppStore } from '../../store/app.store'
 import { ActiveSessionBanner } from '../../features/sessions/components/ActiveSessionBanner'
 import { SessionCompletionToast } from '../../features/sessions/components/SessionCompletionToast'
-import { LogoutButton } from '../../features/auth/components/LogoutButton'
+import { Topbar } from './Topbar'
 
 export default function AppShell() {
   const neurologist = useAppStore((s) => s.auth.neurologist)
+  const activePatientId = useAppStore((s) => s.activeSession.patientId)
   const initials = neurologist?.name?.trim()
     ? neurologist.name.split(' ').filter(Boolean).map((n) => n[0]).join('').slice(0, 2).toUpperCase()
     : '?'
@@ -26,6 +27,31 @@ export default function AppShell() {
             <span className="nav-icon">👥</span>
             Pacientes
           </NavLink>
+
+          <div className="nav-label">MONITOREO</div>
+          {activePatientId ? (
+            <NavLink
+              to={`/patients/${activePatientId}/session`}
+              className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+            >
+              <span className="nav-icon">◉</span>
+              Sesión en Vivo
+            </NavLink>
+          ) : (
+            <div className="nav-item nav-item-muted">
+              <span className="nav-icon">◉</span>
+              Sesión en Vivo
+            </div>
+          )}
+
+          <div className="nav-label">ANÁLISIS</div>
+          <NavLink
+            to="/sessions/history"
+            className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+          >
+            <span className="nav-icon">◫</span>
+            Historial de Sesiones
+          </NavLink>
         </nav>
         <div className="sidebar-user">
           <div className="avatar">{initials}</div>
@@ -33,12 +59,10 @@ export default function AppShell() {
             <div className="user-name">{neurologist?.name ?? 'Neurólogo'}</div>
             <div className="user-role">Neurólogo</div>
           </div>
-          <div style={{ marginLeft: 'auto' }}>
-            <LogoutButton />
-          </div>
         </div>
       </aside>
       <div className="main">
+        <Topbar />
         <ActiveSessionBanner />
         <SessionCompletionToast />
         <Outlet />

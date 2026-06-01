@@ -1,5 +1,6 @@
 import { useParams, Navigate } from 'react-router-dom'
 import { useAppStore } from '../../../store/app.store'
+import { usePatient } from '../../patients/hooks/usePatient'
 import { SessionCloseButton } from '../components/SessionCloseButton'
 import { WsStatusIndicator } from '../components/WsStatusIndicator'
 import { MetricsPanel } from '../components/MetricsPanel'
@@ -8,12 +9,18 @@ import { useSessionWebSocket } from '../hooks/useSessionWebSocket'
 
 const CF_STREAM_ID = import.meta.env.VITE_CF_STREAM_ID as string | undefined
 
+const DIAGNOSIS_LABEL: Record<string, string> = {
+  EA: 'Enfermedad de Alzheimer',
+  MCI: 'Deterioro Cognitivo Leve',
+}
+
 export default function SessionMonitorPage() {
   const { id: patientId } = useParams<{ id: string }>()
   const sessionId = useAppStore((s) => s.activeSession.sessionId)
 
   // MUST be called before any conditional return (React hooks rules)
   useSessionWebSocket(sessionId ?? '')
+  const { data: patient } = usePatient(patientId ?? '')
 
   if (!sessionId) return <Navigate to={`/patients/${patientId ?? ''}`} replace />
 
@@ -24,11 +31,40 @@ export default function SessionMonitorPage() {
         <h1 className="page-title">Monitor de sesión</h1>
         <SessionCloseButton sessionId={sessionId} patientId={patientId ?? ''} />
       </div>
-      <div className="card" style={{ marginBottom: 24 }}>
-        <MetricsPanel sessionId={sessionId} />
+
+      <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: 20, marginBottom: 20 }}>
+        <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
+          <CloudflareStreamPlayer streamId={CF_STREAM_ID ?? ''} />
+        </div>
+        <div className="card">
+          <div className="card-label">PACIENTE EN SESIÓN</div>
+          {patient ? (
+            <div style={{ marginTop: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 14 }}>
+                <div className="patient-avatar" style={{ width: 44, height: 44, fontSize: 15 }}>
+                  {patient.name.trim()[0]?.toUpperCase() ?? '?'}
+                </div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 14 }}>{patient.name}</div>
+                  <div style={{ fontSize: 11, color: 'var(--text2)', fontFamily: 'var(--mono)', marginTop: 2 }}>
+                    {DIAGNOSIS_LABEL[patient.diagnosis] ?? patient.diagnosis}
+                  </div>
+                </div>
+              </div>
+              <span className={`badge ${patient.status === 'active' ? 'badge-green' : 'badge-gray'}`}>
+                {patient.status === 'active' ? 'Activo' : 'Inactivo'}
+              </span>
+            </div>
+          ) : (
+            <div style={{ color: 'var(--text3)', fontSize: 12, fontFamily: 'var(--mono)', marginTop: 8 }}>
+              Cargando paciente…
+            </div>
+          )}
+        </div>
       </div>
+
       <div className="card">
-        <CloudflareStreamPlayer streamId={CF_STREAM_ID ?? ''} />
+        <MetricsPanel sessionId={sessionId} />
       </div>
     </div>
   )
