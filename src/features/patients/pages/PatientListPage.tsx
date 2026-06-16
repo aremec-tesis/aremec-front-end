@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Search, Plus } from 'lucide-react'
 import { usePatients } from '../hooks/usePatients'
 import { useDebounce } from '../../../shared/hooks/useDebounce'
 import { PatientList } from '../components/PatientList'
@@ -26,7 +27,7 @@ export default function PatientListPage() {
     <div className="page">
       <div className="search-row">
         <div className="search-wrap">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><Search size={16} /></span>
           <input
             className="input search-input"
             type="text"
@@ -50,7 +51,7 @@ export default function PatientListPage() {
           <option value="inactive">Inactivo</option>
         </select>
         <button className="btn btn-primary" onClick={() => navigate('/patients/new')}>
-          + Nuevo paciente
+          <Plus size={16} /> Nuevo paciente
         </button>
       </div>
 

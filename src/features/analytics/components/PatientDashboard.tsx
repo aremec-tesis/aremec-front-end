@@ -3,6 +3,8 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid,
 } from 'recharts'
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { usePatientDashboard } from '../hooks/usePatientDashboard'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
@@ -13,11 +15,11 @@ type Props = { patientId: string; selectedSessionId?: string | null }
 
 const TREND_CONFIG: Record<
   'rising' | 'stable' | 'falling',
-  { label: string; className: string; badgeStyle?: { backgroundColor: string; color: string } }
+  { label: string; className: string; icon: LucideIcon; badgeStyle?: { backgroundColor: string; color: string } }
 > = {
-  rising:  { label: 'Tendencia positiva ↑', className: 'badge-green' },
-  stable:  { label: 'Tendencia estable →',  className: 'badge-gray' },
-  falling: { label: 'Tendencia negativa ↓', className: 'badge-gray', badgeStyle: { backgroundColor: 'var(--red, #ef4444)', color: '#fff' } },
+  rising:  { label: 'Tendencia positiva', className: 'badge-green', icon: TrendingUp },
+  stable:  { label: 'Tendencia estable',  className: 'badge-gray', icon: Minus },
+  falling: { label: 'Tendencia negativa', className: 'badge-gray', icon: TrendingDown, badgeStyle: { backgroundColor: 'var(--red, #ef4444)', color: '#fff' } },
 }
 
 const FALLBACK_TREND = TREND_CONFIG['stable']
@@ -65,6 +67,7 @@ export function PatientDashboard({ patientId, selectedSessionId }: Props) {
   }
 
   const trend = TREND_CONFIG[data.globalTrend] ?? FALLBACK_TREND
+  const TrendIcon = trend.icon
 
   const filteredSessions = selectedSessionId
     ? data.sessions.filter(s => s.sessionId === selectedSessionId)
@@ -82,7 +85,10 @@ export function PatientDashboard({ patientId, selectedSessionId }: Props) {
       <div className="card">
         <div style={HEADER_ROW_STYLE}>
           <div className="card-label">TENDENCIA SPS</div>
-          <span className={`badge ${trend.className}`} style={trend.badgeStyle}>{trend.label}</span>
+          <span className={`badge ${trend.className}`} style={trend.badgeStyle}>
+            <TrendIcon size={13} />
+            {trend.label}
+          </span>
         </div>
         <ResponsiveContainer width="100%" height={180}>
           <LineChart data={chartData} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>

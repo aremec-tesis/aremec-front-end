@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router-dom'
+import { Users, Radio, History } from 'lucide-react'
 import { useAppStore } from '../../store/app.store'
 import { ActiveSessionBanner } from '../../features/sessions/components/ActiveSessionBanner'
 import { SessionCompletionToast } from '../../features/sessions/components/SessionCompletionToast'
@@ -24,7 +25,7 @@ export default function AppShell() {
             to="/patients"
             className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
           >
-            <span className="nav-icon">👥</span>
+            <span className="nav-icon"><Users size={18} /></span>
             Pacientes
           </NavLink>
 
@@ -34,12 +35,12 @@ export default function AppShell() {
               to={`/patients/${activePatientId}/session`}
               className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
             >
-              <span className="nav-icon">◉</span>
+              <span className="nav-icon"><Radio size={18} /></span>
               Sesión en Vivo
             </NavLink>
           ) : (
             <div className="nav-item nav-item-muted">
-              <span className="nav-icon">◉</span>
+              <span className="nav-icon"><Radio size={18} /></span>
               Sesión en Vivo
             </div>
           )}
@@ -49,7 +50,7 @@ export default function AppShell() {
             to="/sessions/history"
             className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
           >
-            <span className="nav-icon">◫</span>
+            <span className="nav-icon"><History size={18} /></span>
             Historial de Sesiones
           </NavLink>
         </nav>

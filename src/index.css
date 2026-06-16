@@ -201,10 +201,16 @@ body,
 }
 
 .nav-icon {
-  font-size: 16px;
   width: 20px;
-  text-align: center;
-  opacity: 0.7;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.nav-item.active .nav-icon {
+  opacity: 1;
 }
 
 .nav-badge {
@@ -296,9 +302,12 @@ body,
   font-size: 12px;
   font-weight: 600;
   font-family: var(--mono);
-  padding: 8px 32px;
+  padding: 9px 32px;
   letter-spacing: 0.3px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* ── WS STATUS INDICATOR ── */
@@ -306,9 +315,16 @@ body,
   font-size: 11px;
   font-weight: 600;
   font-family: var(--mono);
-  padding: 6px 32px;
+  padding: 7px 32px;
   flex-shrink: 0;
   letter-spacing: 0.3px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spin-icon {
+  animation: spin 0.9s linear infinite;
 }
 
 .ws-status-reconnecting {
@@ -671,11 +687,13 @@ tbody tr:last-child td {
   top: 50%;
   transform: translateY(-50%);
   color: var(--text3);
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  pointer-events: none;
 }
 
 .search-input {
-  padding-left: 36px !important;
+  padding-left: 38px !important;
 }
 
 /* ── SECTION HEADER ── */
@@ -1297,9 +1315,10 @@ tbody tr:last-child td {
 }
 
 .empty-icon {
-  font-size: 40px;
-  opacity: 0.5;
-  margin-bottom: 12px;
+  display: inline-flex;
+  color: var(--text3);
+  opacity: 0.6;
+  margin-bottom: 14px;
 }
 
 .empty-text {

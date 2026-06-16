@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { LogOut } from 'lucide-react'
 import { logout } from '../../../services/auth.service'
 import { useAppStore } from '../../../store/app.store'
 
@@ -31,6 +32,7 @@ export function LogoutButton() {
       onClick={() => mutate()}
       disabled={isPending}
     >
+      <LogOut size={15} />
       {isPending ? 'Cerrando...' : 'Cerrar sesión'}
     </button>
   )

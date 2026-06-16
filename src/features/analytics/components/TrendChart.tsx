@@ -2,6 +2,8 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip,
   ResponsiveContainer, CartesianGrid,
 } from 'recharts'
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { usePatientTrend } from '../hooks/usePatientTrend'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
@@ -11,9 +13,15 @@ import { formatNumber, formatDate } from '../../../shared/utils/format'
 type Props = { patientId: string }
 
 const TREND_LABEL: Record<'rising' | 'stable' | 'falling', string> = {
-  rising:  'Tendencia positiva ↑',
-  stable:  'Tendencia estable →',
-  falling: 'Tendencia negativa ↓',
+  rising:  'Tendencia positiva',
+  stable:  'Tendencia estable',
+  falling: 'Tendencia negativa',
+}
+
+const TREND_ICON: Record<'rising' | 'stable' | 'falling', LucideIcon> = {
+  rising:  TrendingUp,
+  stable:  Minus,
+  falling: TrendingDown,
 }
 
 export function TrendChart({ patientId }: Props) {
@@ -30,12 +38,17 @@ export function TrendChart({ patientId }: Props) {
     sps: s.sps,
   }))
 
+  const TrendIcon = TREND_ICON[data.trend]
+
   return (
     <div className="card">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div className="card-label">EVOLUCIÓN SPS</div>
-        <div style={{ fontSize: 12, color: 'var(--text2)', display: 'flex', gap: 16 }}>
-          <span>{TREND_LABEL[data.trend] ?? 'Tendencia desconocida'}</span>
+        <div style={{ fontSize: 12, color: 'var(--text2)', display: 'flex', gap: 16, alignItems: 'center' }}>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            {TrendIcon && <TrendIcon size={14} />}
+            {TREND_LABEL[data.trend] ?? 'Tendencia desconocida'}
+          </span>
           <span>Pendiente: {formatNumber(data.slope, 2)}</span>
         </div>
       </div>

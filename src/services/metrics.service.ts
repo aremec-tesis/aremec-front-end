@@ -1,4 +1,5 @@
 import { api } from './api'
+import { asArray } from '../shared/utils/asArray'
 import type {
   LevelMetrics,
   SessionMetrics,
@@ -66,7 +67,7 @@ export async function getSessionMetrics(
   )
   return {
     sessionId: raw.session_id,
-    levels: (raw.levels ?? []).map(toLevelMetrics),
+    levels: asArray<LevelMetricsRaw>(raw?.levels).map(toLevelMetrics),
   }
 }
 
@@ -85,7 +86,7 @@ export async function getPatientTrend(
   return {
     trend: raw.trend,
     slope: raw.slope,
-    sessions: (raw.sessions ?? []).map(s => ({
+    sessions: asArray<{ session_date: string; sps: number }>(raw?.sessions).map(s => ({
       sessionDate: s.session_date,
       sps: s.sps,
     })),

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Radio } from 'lucide-react'
 import { useAppStore } from '../../../store/app.store'
 
 function formatElapsed(totalSeconds: number): string {
@@ -28,6 +29,7 @@ export function ActiveSessionBanner() {
   if (!sessionId || !startedAt) return null
   return (
     <div className="active-session-banner">
+      <Radio size={14} />
       Sesión activa — {formatElapsed(elapsed)}
     </div>
   )

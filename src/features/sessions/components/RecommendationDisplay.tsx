@@ -1,3 +1,5 @@
+import { ArrowUp, ArrowDown, Minus } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import type { MLField } from '../session.types'
 import { MLFieldDisplay } from './MLFieldDisplay'
 
@@ -7,9 +9,15 @@ type RecommendationValue =
   | 'decrease_difficulty'
 
 const RECOMMENDATION_LABEL: Record<RecommendationValue, string> = {
-  increase_difficulty: '↑ Aumentar dificultad',
-  maintain_difficulty: '= Mantener dificultad',
-  decrease_difficulty: '↓ Reducir dificultad',
+  increase_difficulty: 'Aumentar dificultad',
+  maintain_difficulty: 'Mantener dificultad',
+  decrease_difficulty: 'Reducir dificultad',
+}
+
+const RECOMMENDATION_ICON: Record<RecommendationValue, LucideIcon> = {
+  increase_difficulty: ArrowUp,
+  maintain_difficulty: Minus,
+  decrease_difficulty: ArrowDown,
 }
 
 const RECOMMENDATION_BADGE: Record<RecommendationValue, string> = {
@@ -26,13 +34,17 @@ export function RecommendationDisplay({ recommendation }: Props) {
   return (
     <MLFieldDisplay
       field={recommendation}
-      render={(value) => (
-        <span
-          className={`badge recommendation-badge ${RECOMMENDATION_BADGE[value] ?? 'badge-gray'}`}
-        >
-          {RECOMMENDATION_LABEL[value] ?? value}
-        </span>
-      )}
+      render={(value) => {
+        const Icon = RECOMMENDATION_ICON[value]
+        return (
+          <span
+            className={`badge recommendation-badge ${RECOMMENDATION_BADGE[value] ?? 'badge-gray'}`}
+          >
+            {Icon && <Icon size={13} />}
+            {RECOMMENDATION_LABEL[value] ?? value}
+          </span>
+        )
+      }}
     />
   )
 }

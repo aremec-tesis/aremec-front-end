@@ -1,3 +1,4 @@
+import { AlertTriangle } from 'lucide-react'
 import { ApiError } from '../types/shared.types'
 
 type Props = {
@@ -13,6 +14,9 @@ function getMessage(error: unknown): string {
 export function ErrorMessage({ error }: Props) {
   return (
     <div className="empty" role="alert">
+      <div className="empty-icon" style={{ color: 'var(--accent3)' }}>
+        <AlertTriangle size={38} strokeWidth={1.5} />
+      </div>
       <div className="empty-text">{getMessage(error)}</div>
     </div>
   )

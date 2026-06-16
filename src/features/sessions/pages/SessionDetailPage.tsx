@@ -1,4 +1,5 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
 import { MetricDetailTable } from '../../analytics/components/MetricDetailTable'
 
@@ -19,7 +20,7 @@ export default function SessionDetailPage() {
         className="btn btn-ghost btn-sm"
         style={{ marginBottom: 16 }}
       >
-        ← Volver
+        <ArrowLeft size={15} /> Volver
       </button>
       <MetricDetailTable sessionId={id} />
     </div>

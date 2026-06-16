@@ -1,4 +1,5 @@
 import { api } from './api'
+import { asArray } from '../shared/utils/asArray'
 import type { Patient } from '../features/patients/patient.types'
 import type { PatientRegistrationFormData } from '../features/patients/patient.schema'
 import type { PatientDashboardData, SessionSummary, SessionHistoryItem } from '../features/analytics/analytics.types'
@@ -49,8 +50,8 @@ export async function getPatients(params?: PatientListParams): Promise<Patient[]
   if (params?.name) query.set('name', params.name)
   if (params?.status) query.set('status', params.status)
   const qs = query.toString()
-  const raws = await api.get<PatientRaw[]>(`/patients${qs ? `?${qs}` : ''}`)
-  return raws.map(toCamel)
+  const raws = await api.get<unknown>(`/patients${qs ? `?${qs}` : ''}`)
+  return asArray<PatientRaw>(raws).map(toCamel)
 }
 
 export async function getPatient(id: string): Promise<Patient> {
@@ -89,7 +90,7 @@ export async function getDashboard(patientId: string): Promise<PatientDashboardD
   return {
     globalTrend: raw.global_trend,
     trendSlope: raw.trend_slope,
-    sessions: (raw.sessions ?? []).map(toSessionSummary),
+    sessions: asArray<SessionSummaryRaw>(raw?.sessions).map(toSessionSummary),
   }
 }
 
@@ -103,10 +104,10 @@ type SessionHistoryItemRaw = {
 }
 
 export async function getSessionHistory(patientId: string): Promise<SessionHistoryItem[]> {
-  const raw = await api.get<SessionHistoryItemRaw[]>(
+  const raw = await api.get<unknown>(
     `/patients/${encodeURIComponent(patientId)}/sessions`
   )
-  return (raw ?? []).map(s => ({
+  return asArray<SessionHistoryItemRaw>(raw).map(s => ({
     sessionId: s.session_id,
     sessionDate: s.session_date,
     sps: s.sps,

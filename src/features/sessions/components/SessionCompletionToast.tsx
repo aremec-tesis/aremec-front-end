@@ -1,3 +1,4 @@
+import { CheckCircle2 } from 'lucide-react'
 import { useAppStore } from '../../../store/app.store'
 
 export function SessionCompletionToast() {
@@ -10,7 +11,10 @@ export function SessionCompletionToast() {
 
   return (
     <div className="session-completion-toast" role="alert">
-      <span>La sesión ha finalizado. Revise los resultados del paciente.</span>
+      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+        <CheckCircle2 size={16} style={{ color: 'var(--accent)', flexShrink: 0 }} />
+        La sesión ha finalizado. Revise los resultados del paciente.
+      </span>
       <button
         className="btn btn-sm btn-ghost"
         onClick={() => setNotifications({ pendingSessionComplete: false })}
