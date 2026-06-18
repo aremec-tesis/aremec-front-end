@@ -1,5 +1,6 @@
 import { useSessionMetrics } from '../hooks/useSession'
 import { LevelMetricCard } from './LevelMetricCard'
+import { MetricsOpinion } from './MetricsOpinion'
 import { RecommendationDisplay } from './RecommendationDisplay'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
@@ -21,6 +22,15 @@ const METRIC_LABELS: Record<string, string> = {
   rta: 'RTA',
   er: 'ER',
   sps: 'SPS',
+}
+
+const METRIC_DESCRIPTIONS: Record<string, string> = {
+  ors: 'Object Recognition Score — precisión al reconocer objetos presentados previamente.',
+  ers: 'Event Recognition Score — precisión al reconocer eventos o escenas vistas antes.',
+  scs: 'Semantic Comprehension Score — comprensión del significado y las relaciones semánticas.',
+  rta: 'Reaction Time Average — tiempo de reacción promedio ante los estímulos.',
+  er: 'Error Rate — proporción de respuestas incorrectas.',
+  sps: 'Synthesized Performance Score — puntaje compuesto que sintetiza el desempeño global.',
 }
 
 type Props = {
@@ -73,15 +83,19 @@ export function MetricsPanel({ sessionId }: Props) {
             label={METRIC_LABELS[key]}
             value={level[key]}
             domain={METRIC_DOMAINS[key]}
+            description={METRIC_DESCRIPTIONS[key]}
           />
         ))}
         <LevelMetricCard
           label={METRIC_LABELS.sps}
           value={level.sps}
           domain={METRIC_DOMAINS.sps}
+          description={METRIC_DESCRIPTIONS.sps}
           spsClass={level.spsClass}
         />
       </div>
+
+      <MetricsOpinion level={level} />
     </div>
   )
 }

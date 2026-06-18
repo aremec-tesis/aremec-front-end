@@ -3,21 +3,33 @@ import { DomainTag } from './DomainTag'
 import { MLFieldDisplay } from './MLFieldDisplay'
 import { formatNumber } from '../../../shared/utils/format'
 
+// Cognitive-domain tags hidden in the live transmission view.
+const HIDDEN_DOMAINS = new Set(['Memoria episódica', 'Atención sostenida'])
+
 type Props = {
   label: string
   value: number
   domain: string
+  description?: string
   spsClass?: MLField<string>
 }
 
-export function LevelMetricCard({ label, value, domain, spsClass }: Props) {
+export function LevelMetricCard({
+  label,
+  value,
+  domain,
+  description,
+  spsClass,
+}: Props) {
   return (
-    <div className="metric-item">
+    <div className="metric-item" title={description}>
       <div className="metric-val">{formatNumber(value, 2)}</div>
       <div className="metric-abbr">{label}</div>
-      <div className="metric-domain">
-        <DomainTag domain={domain} />
-      </div>
+      {!HIDDEN_DOMAINS.has(domain) && (
+        <div className="metric-domain">
+          <DomainTag domain={domain} />
+        </div>
+      )}
       {spsClass !== undefined && (
         <div className="metric-sps-class">
           <span className="card-label">Clasificación</span>

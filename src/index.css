@@ -998,6 +998,71 @@ tbody tr:last-child td {
   padding: 4px 12px;
 }
 
+/* ── METRICS OPINION ── */
+.metrics-opinion {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--brand-gray);
+  border-radius: var(--radius-sm);
+  background: var(--surface2);
+}
+
+.metrics-opinion-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  color: var(--text2);
+  background: var(--surface3);
+}
+
+.metrics-opinion-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text2);
+  margin-bottom: 3px;
+}
+
+.metrics-opinion-text {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.metrics-opinion-positive {
+  border-left-color: var(--success);
+}
+.metrics-opinion-positive .metrics-opinion-icon {
+  color: var(--success);
+  background: rgba(13, 148, 136, 0.1);
+}
+
+.metrics-opinion-neutral {
+  border-left-color: var(--accent);
+}
+.metrics-opinion-neutral .metrics-opinion-icon {
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.metrics-opinion-caution {
+  border-left-color: var(--warn);
+}
+.metrics-opinion-caution .metrics-opinion-icon {
+  color: var(--warn);
+  background: rgba(217, 119, 6, 0.1);
+}
+
 /* ── TABS ── */
 .tabs {
   display: flex;
