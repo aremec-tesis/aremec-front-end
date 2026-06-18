@@ -906,9 +906,9 @@ tbody tr:last-child td {
 /* ── METRIC HOVER TOOLTIP ── */
 .metric-tooltip {
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 8px);
   left: 50%;
-  transform: translateX(-50%) translateY(4px);
+  transform: translateX(-50%) translateY(-4px);
   width: max-content;
   max-width: 220px;
   padding: 8px 10px;
@@ -929,11 +929,11 @@ tbody tr:last-child td {
 .metric-tooltip::after {
   content: '';
   position: absolute;
-  top: 100%;
+  bottom: 100%;
   left: 50%;
   transform: translateX(-50%);
   border: 5px solid transparent;
-  border-top-color: var(--brand-ink);
+  border-bottom-color: var(--brand-ink);
 }
 
 .metric-item:hover .metric-tooltip,
