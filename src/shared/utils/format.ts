@@ -8,6 +8,20 @@ export function formatNumber(
     : fallback
 }
 
+/**
+ * Format a number rounding to at most `maxDigits` decimals, trimming trailing
+ * zeros (e.g. 0.30170 → "0.302", 0.5 → "0.5", 5 → "5").
+ */
+export function formatNumberMax(
+  value: number | null | undefined,
+  maxDigits: number,
+  fallback = '—',
+): string {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? String(Number(value.toFixed(maxDigits)))
+    : fallback
+}
+
 export function formatDate(
   iso: string | null | undefined,
   opts: Intl.DateTimeFormatOptions,

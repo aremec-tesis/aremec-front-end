@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { usePatients } from '../../patients/hooks/usePatients'
 import { useSessionHistory } from '../../analytics/hooks/useSessionHistory'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
@@ -9,9 +9,15 @@ import { formatDate } from '../../../shared/utils/format'
 
 export default function SessionHistoryPage() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [selectedPatientId, setSelectedPatientId] = useState('')
   const { data: patients, isPending: loadingPatients } = usePatients()
   const { data: sessions, isPending: loadingSessions, error } = useSessionHistory(selectedPatientId)
+
+  const openDetail = (sessionId: string, sessionDate: string, status: 'complete' | 'incomplete') =>
+    navigate(`/sessions/${sessionId}`, {
+      state: { background: location, patientId: selectedPatientId, sessionDate, status },
+    })
 
   return (
     <div className="page">
@@ -56,11 +62,11 @@ export default function SessionHistoryPage() {
                     key={s.sessionId}
                     role="button"
                     tabIndex={0}
-                    onClick={() => navigate(`/sessions/${s.sessionId}`, { state: { patientId: selectedPatientId } })}
+                    onClick={() => openDetail(s.sessionId, s.sessionDate, s.status)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault()
-                        navigate(`/sessions/${s.sessionId}`, { state: { patientId: selectedPatientId } })
+                        openDetail(s.sessionId, s.sessionDate, s.status)
                       }
                     }}
                   >

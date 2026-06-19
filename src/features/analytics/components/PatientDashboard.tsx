@@ -9,7 +9,7 @@ import { usePatientDashboard } from '../hooks/usePatientDashboard'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
 import { EmptyState } from '../../../shared/components/EmptyState'
-import { formatNumber, formatDate } from '../../../shared/utils/format'
+import { formatNumberMax, formatDate } from '../../../shared/utils/format'
 
 type Props = { patientId: string; selectedSessionId?: string | null }
 
@@ -119,7 +119,7 @@ export function PatientDashboard({ patientId, selectedSessionId }: Props) {
               {formatDate(session.sessionDate, { dateStyle: 'medium' })}
             </div>
             <div style={{ fontSize: 13, fontFamily: 'var(--font-mono, monospace)' }}>
-              SPS {formatNumber(session.sps, 1)}
+              SPS {formatNumberMax(session.sps, 3)}
             </div>
             <div style={{ fontSize: 12, color: 'var(--text2)' }}>
               {session.spsClass ?? '—'}

@@ -1,7 +1,14 @@
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import type { Location } from 'react-router-dom'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
-import { MetricDetailTable } from '../../analytics/components/MetricDetailTable'
+import { SessionDetailModal } from '../components/SessionDetailModal'
+
+type DetailState = {
+  background?: Location
+  patientId?: string
+  sessionDate?: string
+  status?: 'complete' | 'incomplete'
+}
 
 export default function SessionDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -10,19 +17,23 @@ export default function SessionDetailPage() {
 
   if (!id) return <ErrorMessage error={new Error('Ruta inválida: falta el ID de sesión')} />
 
-  const statePatientId = (location.state as { patientId?: string } | null)?.patientId
-  const backPath = statePatientId ? `/patients/${statePatientId}` : '/patients'
+  const state = (location.state as DetailState | null) ?? {}
+
+  const handleClose = () => {
+    if (state.background) {
+      navigate(-1)
+    } else {
+      navigate(state.patientId ? `/patients/${state.patientId}` : '/patients')
+    }
+  }
 
   return (
-    <div className="page">
-      <button
-        onClick={() => navigate(backPath)}
-        className="btn btn-ghost btn-sm"
-        style={{ marginBottom: 16 }}
-      >
-        <ArrowLeft size={15} /> Volver
-      </button>
-      <MetricDetailTable sessionId={id} />
-    </div>
+    <SessionDetailModal
+      sessionId={id}
+      patientId={state.patientId}
+      sessionDate={state.sessionDate}
+      status={state.status}
+      onClose={handleClose}
+    />
   )
 }

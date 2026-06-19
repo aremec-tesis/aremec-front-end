@@ -1,5 +1,5 @@
 import type React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useSessionHistory } from '../hooks/useSessionHistory'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
@@ -19,6 +19,7 @@ const SESSION_ROW_STYLE: React.CSSProperties = {
 
 export function SessionHistory({ patientId }: Props) {
   const navigate = useNavigate()
+  const location = useLocation()
   const { data, isPending, error } = useSessionHistory(patientId)
 
   if (isPending) return <LoadingSpinner />
@@ -26,6 +27,11 @@ export function SessionHistory({ patientId }: Props) {
   if (!data || data.length === 0) {
     return <EmptyState message="Sin sesiones registradas" />
   }
+
+  const openDetail = (session: typeof data[number]) =>
+    navigate(`/sessions/${session.sessionId}`, {
+      state: { background: location, patientId, sessionDate: session.sessionDate, status: session.status },
+    })
 
   return (
     <div className="card">
@@ -35,11 +41,11 @@ export function SessionHistory({ patientId }: Props) {
           key={session.sessionId}
           role="button"
           tabIndex={0}
-          onClick={() => navigate(`/sessions/${session.sessionId}`, { state: { patientId } })}
+          onClick={() => openDetail(session)}
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault()
-              navigate(`/sessions/${session.sessionId}`, { state: { patientId } })
+              openDetail(session)
             }
           }}
           style={SESSION_ROW_STYLE}
