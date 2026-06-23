@@ -893,35 +893,67 @@ tbody tr:last-child td {
   position: relative;
 }
 
-.metric-item:hover,
-.metric-item:focus-visible {
+.metric-item:hover {
   border-color: var(--accent);
   background: var(--surface);
   box-shadow: var(--shadow);
-  outline: none;
-  /* Lift the hovered card so its tooltip paints above sibling cards. */
+  /* Lift the hovered card above its grid siblings. */
   z-index: 5;
 }
 
-/* ── METRIC HOVER TOOLTIP ── */
+/* ── METRIC HELP TRIGGER ── */
+.metric-help {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text2);
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: help;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  z-index: 2;
+}
+
+.metric-help:hover,
+.metric-help:focus-visible,
+.metric-help[aria-expanded='true'] {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* ── METRIC HELP TOOLTIP (opens above the "?" trigger) ── */
 .metric-tooltip {
   position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%) translateY(-4px);
+  bottom: calc(100% + 10px);
+  right: -4px;
   width: max-content;
   max-width: 220px;
   padding: 8px 10px;
   background: var(--brand-ink);
   color: #fff;
   font-size: 11px;
+  font-weight: 400;
   line-height: 1.45;
   text-align: left;
+  white-space: normal;
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-md);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
+  transform: translateY(4px);
   transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
   z-index: 60;
 }
@@ -929,18 +961,18 @@ tbody tr:last-child td {
 .metric-tooltip::after {
   content: '';
   position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 100%;
+  right: 9px;
   border: 5px solid transparent;
-  border-bottom-color: var(--brand-ink);
+  border-top-color: var(--brand-ink);
 }
 
-.metric-item:hover .metric-tooltip,
-.metric-item:focus-visible .metric-tooltip {
+.metric-help:hover .metric-tooltip,
+.metric-help:focus-visible .metric-tooltip,
+.metric-help[aria-expanded='true'] .metric-tooltip {
   opacity: 1;
   visibility: visible;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
 }
 
 /* ── PATIENT-IN-SESSION DATA ── */
@@ -999,48 +1031,6 @@ tbody tr:last-child td {
   padding: 2px 8px;
   border-radius: 20px;
   display: inline-block;
-}
-
-.metric-tooltip {
-  visibility: hidden;
-  opacity: 0;
-  width: 220px;
-  background-color: var(--surface);
-  color: var(--text);
-  text-align: center;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 8px 12px;
-  position: absolute;
-  z-index: 10;
-  bottom: 130%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 11px;
-  font-weight: normal;
-  font-family: var(--font);
-  line-height: 1.4;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: opacity 0.2s, visibility 0.2s;
-  pointer-events: none;
-  white-space: normal;
-  word-wrap: break-word;
-}
-
-.metric-tooltip::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  margin-left: -6px;
-  border-width: 6px;
-  border-style: solid;
-  border-color: var(--border) transparent transparent transparent;
-}
-
-.metric-label:hover .metric-tooltip {
-  visibility: visible;
-  opacity: 1;
 }
 
 /* ── ML FIELD DISPLAY ── */

@@ -1,3 +1,4 @@
+import { useId, useState } from 'react'
 import type { MLField } from '../session.types'
 import { DomainTag } from './DomainTag'
 import { MLFieldDisplay } from './MLFieldDisplay'
@@ -21,12 +22,30 @@ export function LevelMetricCard({
   description,
   spsClass,
 }: Props) {
+  const tooltipId = useId()
+  // Click/tap latches the tooltip open (touch + keyboard); CSS handles hover.
+  const [pinned, setPinned] = useState(false)
+
   return (
-    <div className="metric-item" tabIndex={description ? 0 : undefined} aria-label={description}>
+    <div className="metric-item">
       {description && (
-        <div className="metric-tooltip" role="tooltip">
-          {description}
-        </div>
+        <button
+          type="button"
+          className="metric-help"
+          aria-label={`¿Qué significa ${label}?`}
+          aria-expanded={pinned}
+          aria-describedby={tooltipId}
+          onClick={() => setPinned((p) => !p)}
+          onBlur={() => setPinned(false)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') setPinned(false)
+          }}
+        >
+          <span aria-hidden="true">?</span>
+          <span className="metric-tooltip" id={tooltipId} role="tooltip">
+            {description}
+          </span>
+        </button>
       )}
       <div className="metric-val">{formatNumber(value, 2)}</div>
       <div className="metric-abbr">{label}</div>

@@ -33,12 +33,19 @@ const METRIC_DESCRIPTIONS: Record<string, string> = {
   sps: 'Synthesized Performance Score — puntaje compuesto que sintetiza el desempeño global.',
 }
 
+// Real-time backstop: while the live monitor is open, refetch metrics on this
+// cadence so new levels appear even if the WebSocket connects but never pushes a
+// `level_completed` frame. The WS remains the primary, instant update path.
+const METRICS_BACKSTOP_INTERVAL_MS = 3000
+
 type Props = {
   sessionId: string
 }
 
 export function MetricsPanel({ sessionId }: Props) {
-  const { data, isPending, isError, error } = useSessionMetrics(sessionId)
+  const { data, isPending, isError, error } = useSessionMetrics(sessionId, {
+    refetchInterval: METRICS_BACKSTOP_INTERVAL_MS,
+  })
 
   if (isPending) return <LoadingSpinner />
   if (isError) return <ErrorMessage error={error} />
