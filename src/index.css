@@ -1033,6 +1033,90 @@ tbody tr:last-child td {
   display: inline-block;
 }
 
+/* ── INFO TIP (reusable "?" affordance next to labels/headings) ── */
+.infotip {
+  position: relative;
+  display: inline-flex;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+.infotip-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  padding: 0;
+  font-family: var(--font);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--text2);
+  background: var(--surface3);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  cursor: help;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.infotip-trigger:hover,
+.infotip-trigger:focus-visible,
+.infotip-trigger[aria-expanded='true'] {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  outline: none;
+}
+
+.infotip-bubble {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  width: max-content;
+  max-width: 240px;
+  padding: 8px 10px;
+  background: var(--brand-ink);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-transform: none;
+  text-align: left;
+  white-space: normal;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.15s ease, visibility 0.15s;
+  z-index: 60;
+}
+
+/* Horizontal anchoring relative to the "?" trigger. */
+.infotip-center { left: 50%; transform: translateX(-50%); }
+.infotip-left   { left: -6px; }
+.infotip-right  { right: -6px; }
+
+.infotip-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  border: 5px solid transparent;
+  border-top-color: var(--brand-ink);
+}
+.infotip-center::after { left: 50%; transform: translateX(-50%); }
+.infotip-left::after   { left: 11px; }
+.infotip-right::after  { right: 11px; }
+
+.infotip-trigger:hover .infotip-bubble,
+.infotip-trigger:focus-visible .infotip-bubble,
+.infotip-trigger[aria-expanded='true'] .infotip-bubble {
+  opacity: 1;
+  visibility: visible;
+}
+
 /* ── ML FIELD DISPLAY ── */
 .ml-field-pending {
   font-size: 10px;

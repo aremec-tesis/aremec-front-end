@@ -2,6 +2,8 @@ import { TrendingUp, TrendingDown, Minus, Activity, CalendarClock, ClipboardList
 import { formatDate, formatNumber, formatNumberMax } from '../../../shared/utils/format'
 import { TREND_CONFIG, formatRecommendation, type Trend } from '../analytics.constants'
 import type { SessionRow } from '../analytics.types'
+import { InfoTip } from '../../../shared/components/InfoTip'
+import { GLOSSARY } from '../../../shared/constants/glossary'
 
 type Props = {
   rows: SessionRow[]
@@ -33,7 +35,10 @@ export function KpiStrip({ rows, globalTrend, trendSlope }: Props) {
   return (
     <div className="kpi-strip">
       <div className="kpi accent-blue">
-        <div className="kpi-head"><Activity size={15} /> ÚLTIMO SPS</div>
+        <div className="kpi-head">
+          <Activity size={15} /> ÚLTIMO SPS
+          <InfoTip text={GLOSSARY.sps} label="SPS" align="left" />
+        </div>
         <div className="kpi-value">{formatNumberMax(last.sps, 3)}</div>
         {hasDelta && (
           <div className={`kpi-delta ${deltaClass(delta)}`}>
@@ -44,7 +49,10 @@ export function KpiStrip({ rows, globalTrend, trendSlope }: Props) {
       </div>
 
       <div className="kpi accent-cyan">
-        <div className="kpi-head"><TrendIcon size={15} /> TENDENCIA</div>
+        <div className="kpi-head">
+          <TrendIcon size={15} /> TENDENCIA
+          <InfoTip text={`${GLOSSARY.trend} ${GLOSSARY.slope}`} label="Tendencia" align="left" />
+        </div>
         <div className="kpi-value kpi-value-sm">{trend?.label ?? '—'}</div>
         <div className="kpi-sub">
           pendiente {trendSlope != null ? formatNumber(trendSlope, 3) : '—'}
@@ -52,13 +60,19 @@ export function KpiStrip({ rows, globalTrend, trendSlope }: Props) {
       </div>
 
       <div className="kpi accent-amber">
-        <div className="kpi-head"><CalendarClock size={15} /> SESIONES</div>
+        <div className="kpi-head">
+          <CalendarClock size={15} /> SESIONES
+          <InfoTip text={GLOSSARY.sessionsCount} label="Sesiones" align="right" />
+        </div>
         <div className="kpi-value">{rows.length}</div>
         <div className="kpi-sub">{completed} completas · {incomplete} incompletas</div>
       </div>
 
       <div className="kpi accent-rose">
-        <div className="kpi-head"><ClipboardList size={15} /> ÚLTIMA SESIÓN</div>
+        <div className="kpi-head">
+          <ClipboardList size={15} /> ÚLTIMA SESIÓN
+          <InfoTip text={GLOSSARY.lastSession} label="Última sesión" align="right" />
+        </div>
         <div className="kpi-value kpi-value-sm">
           {formatDate(last.sessionDate, { dateStyle: 'medium' })}
         </div>

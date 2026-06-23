@@ -13,6 +13,8 @@ import { RecommendationDistribution } from '../../analytics/components/Recommend
 import { DashboardFilters } from '../../analytics/components/DashboardFilters'
 import { SessionTable } from '../../analytics/components/SessionTable'
 import { applySessionFilters, DEFAULT_FILTERS, type SessionFilters } from '../../analytics/analytics.filters'
+import { InfoTip } from '../../../shared/components/InfoTip'
+import { GLOSSARY } from '../../../shared/constants/glossary'
 
 type Tab = 'resumen' | 'historial' | 'sesion-activa'
 
@@ -118,7 +120,10 @@ export default function PatientProfilePage() {
             <div className="card-label" style={{ marginBottom: 16 }}>FICHA CLÍNICA</div>
             <div className="clinical-grid">
               <div>
-                <div className="card-label">DIAGNÓSTICO</div>
+                <div className="card-label">
+                  DIAGNÓSTICO
+                  <InfoTip text={GLOSSARY.diagnosis} label="diagnóstico" align="left" />
+                </div>
                 <div className="clinical-value">{DIAGNOSIS_LABEL[patient.diagnosis] ?? patient.diagnosis}</div>
               </div>
               <div>
@@ -128,11 +133,17 @@ export default function PatientProfilePage() {
                 </span>
               </div>
               <div>
-                <div className="card-label">RAVLT LÍNEA BASE</div>
+                <div className="card-label">
+                  RAVLT LÍNEA BASE
+                  <InfoTip text={GLOSSARY.ravlt} label="RAVLT línea base" align="center" />
+                </div>
                 <div className="clinical-value mono">{patient.baselineRavlt}</div>
               </div>
               <div>
-                <div className="card-label">SART LÍNEA BASE</div>
+                <div className="card-label">
+                  SART LÍNEA BASE
+                  <InfoTip text={GLOSSARY.sart} label="SART línea base" align="right" />
+                </div>
                 <div className="clinical-value mono">{patient.baselineSart}</div>
               </div>
             </div>

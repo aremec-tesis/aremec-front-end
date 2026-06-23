@@ -1,5 +1,7 @@
 import { RECOMMENDATION_LABEL } from '../analytics.constants'
 import type { SessionRow } from '../analytics.types'
+import { InfoTip } from '../../../shared/components/InfoTip'
+import { GLOSSARY } from '../../../shared/constants/glossary'
 
 type Props = { rows: SessionRow[] }
 
@@ -26,7 +28,10 @@ export function RecommendationDistribution({ rows }: Props) {
 
   return (
     <div className="card">
-      <div className="card-label" style={{ marginBottom: 12 }}>RECOMENDACIONES DE DIFICULTAD</div>
+      <div className="card-label" style={{ marginBottom: 12 }}>
+        RECOMENDACIONES DE DIFICULTAD
+        <InfoTip text={GLOSSARY.recommendation} label="recomendaciones de dificultad" align="right" />
+      </div>
 
       <div className="dist-bar">
         {counts.map(c => (

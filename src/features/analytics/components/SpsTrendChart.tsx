@@ -3,6 +3,8 @@ import {
   ResponsiveContainer, CartesianGrid,
 } from 'recharts'
 import { EmptyState } from '../../../shared/components/EmptyState'
+import { InfoTip } from '../../../shared/components/InfoTip'
+import { GLOSSARY } from '../../../shared/constants/glossary'
 import { formatDate, formatNumber, formatNumberMax } from '../../../shared/utils/format'
 import { TREND_CONFIG, formatRecommendation, type Trend } from '../analytics.constants'
 import type { SessionRow } from '../analytics.types'
@@ -60,7 +62,14 @@ export function SpsTrendChart({ rows, globalTrend }: Props) {
   return (
     <div className="card">
       <div className="card-head-row">
-        <div className="card-label">EVOLUCIÓN DEL SPS</div>
+        <div className="card-label">
+          EVOLUCIÓN DEL SPS
+          <InfoTip
+            text={`${GLOSSARY.sps} ${GLOSSARY.mean} ${GLOSSARY.spsClass}`}
+            label="evolución del SPS"
+            align="left"
+          />
+        </div>
         {trend && (
           <span className={`badge ${trend.badgeClass} badge-inline`}>
             {TrendIcon && <TrendIcon size={13} />}

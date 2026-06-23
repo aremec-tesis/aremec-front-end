@@ -5,6 +5,8 @@ import {
 import { usePatientCognitiveDomains } from '../hooks/usePatientCognitiveDomains'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
 import { EmptyState } from '../../../shared/components/EmptyState'
+import { InfoTip } from '../../../shared/components/InfoTip'
+import { GLOSSARY } from '../../../shared/constants/glossary'
 import { formatDate, formatNumberMax } from '../../../shared/utils/format'
 import { DOMAIN_META } from '../analytics.constants'
 import type { SessionRow } from '../analytics.types'
@@ -69,7 +71,10 @@ export function CognitiveDomainPanel({ patientId, rows }: Props) {
   return (
     <div className="card">
       <div className="card-head-row">
-        <div className="card-label">DOMINIOS COGNITIVOS</div>
+        <div className="card-label">
+          DOMINIOS COGNITIVOS
+          <InfoTip text={GLOSSARY.cognitiveDomains} label="dominios cognitivos" align="left" />
+        </div>
         <select
           className="filter-select"
           value={selectedSessionId ?? sessionIds[sessionIds.length - 1] ?? ''}
