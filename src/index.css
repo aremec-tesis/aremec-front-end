@@ -839,21 +839,9 @@ tbody tr:last-child td {
   border: none;
 }
 
-.live-loading-overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  background: rgba(0, 0, 0, .55);
-  color: var(--text3);
-  font-family: var(--mono);
-  font-size: 13px;
-  text-align: center;
-  padding: 20px;
+.live-background.is-hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .live-badge {
