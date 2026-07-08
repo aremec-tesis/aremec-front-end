@@ -5,6 +5,7 @@ import { RecommendationDisplay } from './RecommendationDisplay'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
 import { EmptyState } from '../../../shared/components/EmptyState'
+import { getMetricInterpretation } from '../metricInterpretation'
 
 const METRIC_DOMAINS: Record<string, string> = {
   ors: 'Memoria episódica',
@@ -90,14 +91,14 @@ export function MetricsPanel({ sessionId }: Props) {
             label={METRIC_LABELS[key]}
             value={level[key]}
             domain={METRIC_DOMAINS[key]}
-            description={METRIC_DESCRIPTIONS[key]}
+            description={`${METRIC_DESCRIPTIONS[key]} ${getMetricInterpretation(key, level[key])}`}
           />
         ))}
         <LevelMetricCard
           label={METRIC_LABELS.sps}
           value={level.sps}
           domain={METRIC_DOMAINS.sps}
-          description={METRIC_DESCRIPTIONS.sps}
+          description={`${METRIC_DESCRIPTIONS.sps} ${getMetricInterpretation('sps', level.sps)}`}
           spsClass={level.spsClass}
         />
       </div>
