@@ -5,7 +5,7 @@ import { RecommendationDisplay } from './RecommendationDisplay'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
 import { ErrorMessage } from '../../../shared/components/ErrorMessage'
 import { EmptyState } from '../../../shared/components/EmptyState'
-import { getMetricInterpretation } from '../metricInterpretation'
+import { getMetricReading } from '../metricInterpretation'
 
 const METRIC_DOMAINS: Record<string, string> = {
   ors: 'Memoria episódica',
@@ -23,15 +23,6 @@ const METRIC_LABELS: Record<string, string> = {
   rta: 'RTA',
   er: 'ER',
   sps: 'SPS',
-}
-
-const METRIC_DESCRIPTIONS: Record<string, string> = {
-  ors: 'Object Recognition Score — precisión al reconocer objetos presentados previamente.',
-  ers: 'Event Recognition Score — precisión al reconocer eventos o escenas vistas antes.',
-  scs: 'Semantic Comprehension Score — comprensión del significado y las relaciones semánticas.',
-  rta: 'Reaction Time Average — tiempo de reacción promedio ante los estímulos.',
-  er: 'Error Rate — proporción de respuestas incorrectas.',
-  sps: 'Synthesized Performance Score — puntaje compuesto que sintetiza el desempeño global.',
 }
 
 // Real-time backstop: while the live monitor is open, refetch metrics on this
@@ -65,6 +56,7 @@ export function MetricsPanel({ sessionId }: Props) {
   }
 
   const level = [...levels].sort((a, b) => b.level - a.level)[0]
+  const spsReading = getMetricReading('sps', level.sps)
 
   return (
     <div className="metrics-panel">
@@ -85,20 +77,25 @@ export function MetricsPanel({ sessionId }: Props) {
       </div>
 
       <div className="metrics-live">
-        {(['ors', 'ers', 'scs', 'rta', 'er'] as const).map((key) => (
-          <LevelMetricCard
-            key={key}
-            label={METRIC_LABELS[key]}
-            value={level[key]}
-            domain={METRIC_DOMAINS[key]}
-            description={`${METRIC_DESCRIPTIONS[key]} ${getMetricInterpretation(key, level[key])}`}
-          />
-        ))}
+        {(['ors', 'ers', 'scs', 'rta', 'er'] as const).map((key) => {
+          const { quality, note } = getMetricReading(key, level[key])
+          return (
+            <LevelMetricCard
+              key={key}
+              label={METRIC_LABELS[key]}
+              value={level[key]}
+              domain={METRIC_DOMAINS[key]}
+              note={note}
+              quality={quality}
+            />
+          )
+        })}
         <LevelMetricCard
           label={METRIC_LABELS.sps}
           value={level.sps}
           domain={METRIC_DOMAINS.sps}
-          description={`${METRIC_DESCRIPTIONS.sps} ${getMetricInterpretation('sps', level.sps)}`}
+          note={spsReading.note}
+          quality={spsReading.quality}
           spsClass={level.spsClass}
         />
       </div>

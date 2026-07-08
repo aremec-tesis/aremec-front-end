@@ -5,10 +5,10 @@ const LOW = 0.4
 const HIGH = 0.7
 const RTA_MAX_SECONDS = 8.0
 
-type MetricKey = 'ors' | 'ers' | 'scs' | 'rta' | 'er' | 'sps'
-type Quality = 'low' | 'medium' | 'high'
+export type MetricKey = 'ors' | 'ers' | 'scs' | 'rta' | 'er' | 'sps'
+export type MetricQuality = 'low' | 'medium' | 'high'
 
-const MESSAGES: Record<MetricKey, Record<Quality, string>> = {
+const MESSAGES: Record<MetricKey, Record<MetricQuality, string>> = {
   ors: {
     low: 'Desempeño bajo en reconocimiento de objetos: el paciente identifica con dificultad los objetos vistos previamente. Campo por mejorar.',
     medium: 'Desempeño medio en reconocimiento de objetos: el paciente identifica correctamente parte de los objetos vistos previamente.',
@@ -41,7 +41,7 @@ const MESSAGES: Record<MetricKey, Record<Quality, string>> = {
   },
 }
 
-function qualityOf(score: number): Quality {
+function qualityOf(score: number): MetricQuality {
   if (score < LOW) return 'low'
   if (score > HIGH) return 'high'
   return 'medium'
@@ -56,6 +56,7 @@ function scoreOf(key: MetricKey, value: number): number {
   return Math.min(1, Math.max(0, value))
 }
 
-export function getMetricInterpretation(key: MetricKey, value: number): string {
-  return MESSAGES[key][qualityOf(scoreOf(key, value))]
+export function getMetricReading(key: MetricKey, value: number): { quality: MetricQuality; note: string } {
+  const quality = qualityOf(scoreOf(key, value))
+  return { quality, note: MESSAGES[key][quality] }
 }

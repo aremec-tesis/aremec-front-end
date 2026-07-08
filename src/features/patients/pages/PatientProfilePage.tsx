@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useAppStore } from '../../../store/app.store'
 import { usePatient } from '../hooks/usePatient'
 import { SessionOpenButton } from '../../sessions/components/SessionOpenButton'
 import { LoadingSpinner } from '../../../shared/components/LoadingSpinner'
@@ -16,7 +15,7 @@ import { applySessionFilters, DEFAULT_FILTERS, type SessionFilters } from '../..
 import { InfoTip } from '../../../shared/components/InfoTip'
 import { GLOSSARY } from '../../../shared/constants/glossary'
 
-type Tab = 'resumen' | 'historial' | 'sesion-activa'
+type Tab = 'resumen' | 'historial'
 
 const DIAGNOSIS_LABEL: Record<string, string> = {
   EA: 'Enfermedad de Alzheimer',
@@ -25,8 +24,6 @@ const DIAGNOSIS_LABEL: Record<string, string> = {
 
 export default function PatientProfilePage() {
   const { id } = useParams<{ id: string }>()
-  const activePatientId = useAppStore(s => s.activeSession.patientId)
-  const showSessionTab = activePatientId === id
 
   const [activeTab, setActiveTab] = useState<Tab>('resumen')
   const [filters, setFilters] = useState<SessionFilters>(DEFAULT_FILTERS)
@@ -39,10 +36,6 @@ export default function PatientProfilePage() {
     setActiveTab('resumen')
     setFilters(DEFAULT_FILTERS)
   }
-
-  // Derive the visible tab so a closed active session never leaves us stranded.
-  const effectiveTab: Tab =
-    activeTab === 'sesion-activa' && !showSessionTab ? 'resumen' : activeTab
 
   const { data: patient, isPending, error } = usePatient(id ?? '')
   const sessions = usePatientSessions(id ?? '')
@@ -78,28 +71,20 @@ export default function PatientProfilePage() {
 
       <div className="tabs">
         <button
-          className={`tab${effectiveTab === 'resumen' ? ' active' : ''}`}
+          className={`tab${activeTab === 'resumen' ? ' active' : ''}`}
           onClick={() => setActiveTab('resumen')}
         >
           Resumen
         </button>
         <button
-          className={`tab${effectiveTab === 'historial' ? ' active' : ''}`}
+          className={`tab${activeTab === 'historial' ? ' active' : ''}`}
           onClick={() => setActiveTab('historial')}
         >
           Historial
         </button>
-        {showSessionTab && (
-          <button
-            className={`tab${effectiveTab === 'sesion-activa' ? ' active' : ''}`}
-            onClick={() => setActiveTab('sesion-activa')}
-          >
-            Sesión activa
-          </button>
-        )}
       </div>
 
-      {effectiveTab === 'resumen' && (
+      {activeTab === 'resumen' && (
         <div className="dashboard-grid">
           {sessions.error && <ErrorMessage error={sessions.error} />}
 
@@ -153,7 +138,7 @@ export default function PatientProfilePage() {
         </div>
       )}
 
-      {effectiveTab === 'historial' && (
+      {activeTab === 'historial' && (
         <div className="dashboard-grid">
           {sessions.error && <ErrorMessage error={sessions.error} />}
           {sessions.isPending
@@ -169,12 +154,6 @@ export default function PatientProfilePage() {
                 <SessionTable rows={filteredRows} patientId={id} />
               </>
             )}
-        </div>
-      )}
-
-      {effectiveTab === 'sesion-activa' && (
-        <div className="card">
-          <p className="meta-muted">Monitoreo de sesión activa — disponible en Epic 3</p>
         </div>
       )}
     </div>

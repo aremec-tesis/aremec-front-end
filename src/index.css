@@ -898,19 +898,46 @@ tbody tr:last-child td {
 .metric-item {
   background: var(--surface2);
   border: 1px solid var(--border);
+  border-left: 4px solid var(--border-strong);
   border-radius: var(--radius);
-  padding: 16px 12px;
-  text-align: center;
+  padding: 14px;
+  text-align: left;
   transition: all 0.2s;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .metric-item:hover {
-  border-color: var(--accent);
+  /* Individual sides, not the `border-color` shorthand, so the tone accent
+     on the left edge survives the hover highlight. */
+  border-top-color: var(--accent);
+  border-right-color: var(--accent);
+  border-bottom-color: var(--accent);
   background: var(--surface);
   box-shadow: var(--shadow);
   /* Lift the hovered card above its grid siblings. */
   z-index: 5;
+}
+
+.metric-item-low { border-left-color: var(--warn); }
+.metric-item-medium { border-left-color: var(--accent); }
+.metric-item-high { border-left-color: var(--success); }
+
+.metric-item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.metric-note {
+  margin: 0;
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--text2);
 }
 
 /* ── METRIC HELP TRIGGER ── */
@@ -1022,10 +1049,10 @@ tbody tr:last-child td {
 }
 
 .metric-val {
-  font-size: 28px;
+  font-size: 22px;
   font-weight: 700;
   font-family: var(--mono);
-  margin-bottom: 8px;
+  color: var(--text);
 }
 
 .metric-label {
@@ -1145,13 +1172,11 @@ tbody tr:last-child td {
 
 /* ── METRIC CARD EXTRAS ── */
 .metric-domain {
-  margin-top: 6px;
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .metric-sps-class {
-  margin-top: 10px;
   border-top: 1px solid var(--border);
   padding-top: 8px;
   text-align: left;
