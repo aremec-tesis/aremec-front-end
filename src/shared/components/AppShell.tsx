@@ -6,11 +6,7 @@ import { SessionCompletionToast } from '../../features/sessions/components/Sessi
 import { Topbar } from './Topbar'
 
 export default function AppShell() {
-  const neurologist = useAppStore((s) => s.auth.neurologist)
   const activePatientId = useAppStore((s) => s.activeSession.patientId)
-  const initials = neurologist?.name?.trim()
-    ? neurologist.name.split(' ').filter(Boolean).map((n) => n[0]).join('').slice(0, 2).toUpperCase()
-    : '?'
 
   return (
     <div className="app-shell">
@@ -50,13 +46,6 @@ export default function AppShell() {
             </div>
           )}
         </nav>
-        <div className="sidebar-user">
-          <div className="avatar">{initials}</div>
-          <div>
-            <div className="user-name">{neurologist?.name ?? 'Neurólogo'}</div>
-            <div className="user-role">Neurólogo</div>
-          </div>
-        </div>
       </aside>
       <div className="main">
         <Topbar />
