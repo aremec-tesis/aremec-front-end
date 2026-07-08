@@ -93,6 +93,12 @@ export function useSessionWebSocket(sessionId: string): void {
             })
             setActiveSession({ currentLevel: data.level })
           } else if (data.type === 'session_completed') {
+            // The session's last level emits `session_completed` instead of its
+            // own `level_completed` frame (see docs/session-flow.md) — without
+            // this, that final level's metrics never refresh until the 3s poll.
+            queryClient.invalidateQueries({
+              queryKey: ['session', sessionId, 'metrics'],
+            })
             setNotifications({ pendingSessionComplete: true })
           }
         } catch {

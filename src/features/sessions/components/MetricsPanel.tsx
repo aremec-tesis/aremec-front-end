@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useSessionMetrics } from '../hooks/useSession'
 import { LevelMetricCard } from './LevelMetricCard'
 import { MetricsOpinion } from './MetricsOpinion'
@@ -38,6 +39,10 @@ export function MetricsPanel({ sessionId }: Props) {
   const { data, isPending, isError, error } = useSessionMetrics(sessionId, {
     refetchInterval: METRICS_BACKSTOP_INTERVAL_MS,
   })
+  // Which level to display — null always follows the latest completed level;
+  // set to a specific level number only while the neurologist has pinned the
+  // toggle to an earlier level.
+  const [pinnedLevel, setPinnedLevel] = useState<number | null>(null)
 
   if (isPending) return <LoadingSpinner />
   if (isError) return <ErrorMessage error={error} />
@@ -55,14 +60,25 @@ export function MetricsPanel({ sessionId }: Props) {
     )
   }
 
-  const level = [...levels].sort((a, b) => b.level - a.level)[0]
+  const sortedLevels = [...levels].sort((a, b) => a.level - b.level)
+  const firstLevel = sortedLevels[0]
+  const lastLevel = sortedLevels[sortedLevels.length - 1]
+  const hasMultipleLevels = sortedLevels.length > 1
+
+  const level =
+    (pinnedLevel != null ? sortedLevels.find((l) => l.level === pinnedLevel) : undefined) ??
+    lastLevel
+  const isLastLevel = level.level === lastLevel.level
+
   const spsReading = getMetricReading('sps', level.sps)
 
   return (
     <div className="metrics-panel">
       <div className="section-header">
         <div>
-          <div className="section-title">Métricas en tiempo real</div>
+          <div className="section-title">
+            {isLastLevel ? 'Métricas del último nivel jugado' : 'Métricas del primer nivel jugado'}
+          </div>
           <div className="section-sub">Nivel completado: {level.level}</div>
         </div>
         <div className="metrics-recommendation">
@@ -75,6 +91,29 @@ export function MetricsPanel({ sessionId }: Props) {
           <RecommendationDisplay recommendation={level.recommendation} />
         </div>
       </div>
+
+      {hasMultipleLevels && (
+        <div className="level-toggle" role="tablist" aria-label="Seleccionar nivel">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={!isLastLevel}
+            className={`level-toggle-btn${!isLastLevel ? ' active' : ''}`}
+            onClick={() => setPinnedLevel(firstLevel.level)}
+          >
+            Nivel {firstLevel.level}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={isLastLevel}
+            className={`level-toggle-btn${isLastLevel ? ' active' : ''}`}
+            onClick={() => setPinnedLevel(null)}
+          >
+            Nivel {lastLevel.level} · Último
+          </button>
+        </div>
+      )}
 
       <div className="metrics-live">
         {(['ors', 'ers', 'scs', 'rta', 'er'] as const).map((key) => {
