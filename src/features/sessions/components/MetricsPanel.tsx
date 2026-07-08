@@ -39,10 +39,10 @@ export function MetricsPanel({ sessionId }: Props) {
   const { data, isPending, isError, error } = useSessionMetrics(sessionId, {
     refetchInterval: METRICS_BACKSTOP_INTERVAL_MS,
   })
-  // Which level to display — null always follows the latest completed level;
-  // set to a specific level number only while the neurologist has pinned the
-  // toggle to an earlier level.
-  const [pinnedLevel, setPinnedLevel] = useState<number | null>(null)
+  // Which level to display. Keyed by position, not the `level` field itself —
+  // that field has been coming back empty from the API, which silently broke
+  // the toggle when it compared by value instead.
+  const [showFirstLevel, setShowFirstLevel] = useState(false)
 
   if (isPending) return <LoadingSpinner />
   if (isError) return <ErrorMessage error={error} />
@@ -60,15 +60,15 @@ export function MetricsPanel({ sessionId }: Props) {
     )
   }
 
+  // `.sort` falls back to array order (already chronological) if `.level` is
+  // empty on every entry, so first/last by position stay correct either way.
   const sortedLevels = [...levels].sort((a, b) => a.level - b.level)
   const firstLevel = sortedLevels[0]
   const lastLevel = sortedLevels[sortedLevels.length - 1]
   const hasMultipleLevels = sortedLevels.length > 1
 
-  const level =
-    (pinnedLevel != null ? sortedLevels.find((l) => l.level === pinnedLevel) : undefined) ??
-    lastLevel
-  const isLastLevel = level.level === lastLevel.level
+  const isLastLevel = !showFirstLevel || !hasMultipleLevels
+  const level = isLastLevel ? lastLevel : firstLevel
 
   const spsReading = getMetricReading('sps', level.sps)
 
@@ -79,7 +79,9 @@ export function MetricsPanel({ sessionId }: Props) {
           <div className="section-title">
             {isLastLevel ? 'Métricas del último nivel jugado' : 'Métricas del primer nivel jugado'}
           </div>
-          <div className="section-sub">Nivel completado: {level.level}</div>
+          <div className="section-sub">
+            Viendo nivel {isLastLevel ? sortedLevels.length : 1} de {sortedLevels.length}
+          </div>
         </div>
         <div className="metrics-recommendation">
           <span
@@ -99,18 +101,18 @@ export function MetricsPanel({ sessionId }: Props) {
             role="tab"
             aria-selected={!isLastLevel}
             className={`level-toggle-btn${!isLastLevel ? ' active' : ''}`}
-            onClick={() => setPinnedLevel(firstLevel.level)}
+            onClick={() => setShowFirstLevel(true)}
           >
-            Nivel {firstLevel.level}
+            Nivel Anterior
           </button>
           <button
             type="button"
             role="tab"
             aria-selected={isLastLevel}
             className={`level-toggle-btn${isLastLevel ? ' active' : ''}`}
-            onClick={() => setPinnedLevel(null)}
+            onClick={() => setShowFirstLevel(false)}
           >
-            Nivel {lastLevel.level} · Último
+            Último Nivel
           </button>
         </div>
       )}

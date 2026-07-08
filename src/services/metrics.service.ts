@@ -12,7 +12,7 @@ import type {
 } from '../features/analytics/analytics.types'
 
 type LevelMetricsRaw = {
-  level: number
+  level_number: number
   ors: number
   ers: number
   scs: number
@@ -50,7 +50,7 @@ function toRecommendationField(
 
 function toLevelMetrics(raw: LevelMetricsRaw): LevelMetrics {
   return {
-    level: raw.level,
+    level: raw.level_number,
     ors: raw.ors,
     ers: raw.ers,
     scs: raw.scs,
