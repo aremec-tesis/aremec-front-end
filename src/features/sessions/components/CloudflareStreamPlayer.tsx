@@ -1,64 +1,184 @@
 import { useEffect, useRef, useState } from 'react'
-import { Stream } from '@cloudflare/stream-react'
 
 type Props = {
   streamId: string
+  /** Cloudflare Stream customer domain, e.g. `customer-xxxx.cloudflarestream.com`. */
+  customerDomain: string
 }
 
-// Single constant driving every recovery timing so the whole loop feels like
-// one continuous 3s cadence: how long a frozen feed is tolerated before being
-// treated as dropped, and how often a fresh embed is retried while down.
-// Cloudflare's embed can go silent on a brief network blip — the iframe stays
-// "playing" but stops advancing, without ever firing `onError` — so this is
-// what actually catches it instead of leaving a frozen frame on screen.
-const RECOVERY_INTERVAL_MS = 3000
-// Polling tick for the watchdog check itself — kept well under the recovery
-// interval so detection latency stays close to 3s instead of 3s + tick.
-const HEALTH_CHECK_INTERVAL_MS = 500
+// The VR headset publishes over WebRTC (WHIP). Cloudflare only lets WHIP inputs
+// be watched over WHEP — there is no HLS/DASH fallback — so we speak WHEP
+// directly with an RTCPeerConnection instead of going through Cloudflare's
+// iframe player. That player auto-updates (`sdk-iframe-integration…latest.js`)
+// and probes `/webRTC/play` with HEAD, a method the endpoint does not accept,
+// which leaves the embed stuck on a stream of 404s even while the input is live.
 
-export function CloudflareStreamPlayer({ streamId }: Props) {
-  const [attempt, setAttempt] = useState(0)
-  const [isLive, setIsLive] = useState(false)
+/** How often `/lifecycle` is polled while waiting for the headset to go live. */
+const LIFECYCLE_POLL_MS = 3000
+/** Feed considered frozen when the video clock does not advance for this long. */
+const FROZEN_FEED_MS = 5000
+/** Grace period for a transient ICE `disconnected` before tearing down. */
+const ICE_DISCONNECT_GRACE_MS = 3000
+/** Upper bound for non-trickle ICE gathering before sending the offer anyway. */
+const ICE_GATHER_TIMEOUT_MS = 2000
+
+type Phase = 'waiting' | 'connecting' | 'live'
+
+function waitForIceGathering(pc: RTCPeerConnection): Promise<void> {
+  if (pc.iceGatheringState === 'complete') return Promise.resolve()
+  return new Promise((resolve) => {
+    const done = () => {
+      pc.removeEventListener('icegatheringstatechange', onChange)
+      clearTimeout(timer)
+      resolve()
+    }
+    const onChange = () => {
+      if (pc.iceGatheringState === 'complete') done()
+    }
+    const timer = setTimeout(done, ICE_GATHER_TIMEOUT_MS)
+    pc.addEventListener('icegatheringstatechange', onChange)
+  })
+}
+
+export function CloudflareStreamPlayer({ streamId, customerDomain }: Props) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const [phase, setPhase] = useState<Phase>('waiting')
   const [hasBeenLive, setHasBeenLive] = useState(false)
-  const lastActivityRef = useRef(0)
+  // Bumping this tears the current session down and starts a fresh one.
+  const [session, setSession] = useState(0)
 
-  const markAlive = () => {
-    lastActivityRef.current = Date.now()
-  }
+  const id = streamId.trim()
+  const baseUrl = `https://${customerDomain.trim()}/${id}`
 
-  const handlePlaying = () => {
-    markAlive()
-    setIsLive(true)
-    setHasBeenLive(true)
-  }
-
-  // Force a fresh embed every RECOVERY_INTERVAL_MS while not live — this is
-  // what actually recovers the feed after a drop, with no page reload required.
   useEffect(() => {
-    if (!streamId.trim() || isLive) return
+    if (!id) return
 
-    const timer = setInterval(() => {
-      setAttempt((n) => n + 1)
-    }, RECOVERY_INTERVAL_MS)
+    let cancelled = false
+    let pc: RTCPeerConnection | null = null
+    let resourceUrl: string | null = null
+    let pollTimer: ReturnType<typeof setTimeout> | undefined
+    let disconnectTimer: ReturnType<typeof setTimeout> | undefined
+    let watchdog: ReturnType<typeof setInterval> | undefined
 
-    return () => clearInterval(timer)
-  }, [streamId, isLive])
+    const restart = () => {
+      if (!cancelled) setSession((n) => n + 1)
+    }
 
-  // Watchdog: while marked live, confirm the feed is still actually advancing.
-  useEffect(() => {
-    if (!isLive) return
-    markAlive()
+    const startWatchdog = () => {
+      const video = videoRef.current
+      if (!video) return
+      let lastTime = video.currentTime
+      let lastAdvance = Date.now()
+      watchdog = setInterval(() => {
+        if (video.currentTime !== lastTime) {
+          lastTime = video.currentTime
+          lastAdvance = Date.now()
+        } else if (Date.now() - lastAdvance > FROZEN_FEED_MS) {
+          restart()
+        }
+      }, 1000)
+    }
 
-    const interval = setInterval(() => {
-      if (Date.now() - lastActivityRef.current > RECOVERY_INTERVAL_MS) {
-        setIsLive(false)
+    const connect = async () => {
+      setPhase('connecting')
+      pc = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun.cloudflare.com:3478' }],
+        bundlePolicy: 'max-bundle',
+      })
+      pc.addTransceiver('video', { direction: 'recvonly' })
+      pc.addTransceiver('audio', { direction: 'recvonly' })
+
+      const remote = new MediaStream()
+      pc.ontrack = (event) => {
+        remote.addTrack(event.track)
+        const video = videoRef.current
+        if (video && video.srcObject !== remote) {
+          video.srcObject = remote
+          void video.play().catch(() => {})
+        }
       }
-    }, HEALTH_CHECK_INTERVAL_MS)
 
-    return () => clearInterval(interval)
-  }, [isLive])
+      pc.onconnectionstatechange = () => {
+        if (!pc || cancelled) return
+        const state = pc.connectionState
+        if (state === 'failed' || state === 'closed') {
+          restart()
+        } else if (state === 'disconnected') {
+          disconnectTimer = setTimeout(restart, ICE_DISCONNECT_GRACE_MS)
+        } else if (state === 'connected') {
+          clearTimeout(disconnectTimer)
+        }
+      }
 
-  if (!streamId.trim()) {
+      await pc.setLocalDescription(await pc.createOffer())
+      await waitForIceGathering(pc)
+      if (cancelled || !pc.localDescription) return
+
+      const res = await fetch(`${baseUrl}/webRTC/play`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/sdp' },
+        body: pc.localDescription.sdp,
+      })
+      if (cancelled) return
+      if (!res.ok) throw new Error(`WHEP ${res.status}`)
+
+      const location = res.headers.get('Location')
+      if (location) resourceUrl = new URL(location, baseUrl).toString()
+
+      await pc.setRemoteDescription({ type: 'answer', sdp: await res.text() })
+    }
+
+    // Wait (cheaply) until Cloudflare reports the input as live, then negotiate.
+    const poll = async () => {
+      try {
+        const res = await fetch(`${baseUrl}/lifecycle`, { cache: 'no-store' })
+        const info = (await res.json()) as { live?: boolean }
+        if (cancelled) return
+        if (info.live) {
+          await connect()
+          return
+        }
+      } catch (err) {
+        if (cancelled) return
+        console.warn('[CloudflareStreamPlayer]', err)
+        // A failed negotiation leaves a half-open peer — start clean.
+        if (pc) {
+          restart()
+          return
+        }
+      }
+      if (!cancelled) {
+        setPhase('waiting')
+        pollTimer = setTimeout(poll, LIFECYCLE_POLL_MS)
+      }
+    }
+
+    const video = videoRef.current
+    const onPlaying = () => {
+      if (cancelled) return
+      setPhase('live')
+      setHasBeenLive(true)
+      clearInterval(watchdog)
+      startWatchdog()
+    }
+    video?.addEventListener('playing', onPlaying)
+
+    void poll()
+
+    return () => {
+      cancelled = true
+      clearTimeout(pollTimer)
+      clearTimeout(disconnectTimer)
+      clearInterval(watchdog)
+      video?.removeEventListener('playing', onPlaying)
+      if (video) video.srcObject = null
+      pc?.close()
+      // Release the WHEP session on Cloudflare's side.
+      if (resourceUrl) void fetch(resourceUrl, { method: 'DELETE' }).catch(() => {})
+    }
+  }, [id, baseUrl, session])
+
+  if (!id) {
     return (
       <div className="live-wrapper">
         <div
@@ -70,6 +190,16 @@ export function CloudflareStreamPlayer({ streamId }: Props) {
       </div>
     )
   }
+
+  const isLive = phase === 'live'
+  const placeholder =
+    phase === 'waiting'
+      ? hasBeenLive
+        ? 'Señal perdida — esperando que la RV vuelva a transmitir…'
+        : 'Esperando transmisión de la RV…'
+      : hasBeenLive
+        ? 'Reconectando con el stream…'
+        : 'Conectando con el stream…'
 
   return (
     <div className="live-wrapper">
@@ -85,23 +215,12 @@ export function CloudflareStreamPlayer({ streamId }: Props) {
             justifyContent: 'center',
           }}
         >
-          {hasBeenLive ? 'Reconectando con el stream…' : 'Conectando con el stream…'}
+          {placeholder}
         </div>
       )}
-      <Stream
-        key={attempt}
-        className={`live-background ${isLive ? 'is-live' : 'is-hidden'}`}
-        src={streamId}
-        title="Stream VR en vivo"
-        autoplay
-        muted
-        responsive={false}
-        onPlaying={handlePlaying}
-        onCanPlay={markAlive}
-        onTimeUpdate={markAlive}
-        onProgress={markAlive}
-        onError={() => setIsLive(false)}
-      />
+      <div className={`live-background ${isLive ? 'is-live' : 'is-hidden'}`}>
+        <video ref={videoRef} title="Stream VR en vivo" autoPlay muted playsInline />
+      </div>
 
       {isLive && (
         <div className="live-badge">

@@ -8,6 +8,10 @@ import { CloudflareStreamPlayer } from '../components/CloudflareStreamPlayer'
 import { useSessionWebSocket } from '../hooks/useSessionWebSocket'
 
 const CF_STREAM_ID = import.meta.env.VITE_CF_STREAM_ID as string | undefined
+// Public playback domain (not a secret) — overridable per environment.
+const CF_STREAM_CUSTOMER_DOMAIN =
+  (import.meta.env.VITE_CF_STREAM_CUSTOMER_DOMAIN as string | undefined) ??
+  'customer-v51vl5u2m9swpj02.cloudflarestream.com'
 
 const DIAGNOSIS_LABEL: Record<string, string> = {
   EA: 'Enfermedad de Alzheimer',
@@ -34,7 +38,10 @@ export default function SessionMonitorPage() {
 
       <div className="session-monitor-grid">
         <div className="card" style={{ padding: 0, overflow: 'hidden' }}>
-          <CloudflareStreamPlayer streamId={CF_STREAM_ID ?? ''} />
+          <CloudflareStreamPlayer
+            streamId={CF_STREAM_ID ?? ''}
+            customerDomain={CF_STREAM_CUSTOMER_DOMAIN}
+          />
         </div>
         <div className="card">
           <div className="card-label">Paciente en sesión</div>
