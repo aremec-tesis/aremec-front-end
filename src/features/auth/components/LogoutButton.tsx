@@ -1,29 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useNavigate } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
 import { LogOut } from 'lucide-react'
-import { logout } from '../../../services/auth.service'
-import { useAppStore } from '../../../store/app.store'
+import { useEndSession } from '../hooks/useEndSession'
 
 export function LogoutButton() {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-  const setAuth = useAppStore((s) => s.setAuth)
-  const resetActiveSession = useAppStore((s) => s.resetActiveSession)
-  const setNotifications = useAppStore((s) => s.setNotifications)
-
-  const resetAndRedirect = () => {
-    setAuth({ neurologist: null, status: 'unauthenticated' })
-    resetActiveSession()
-    setNotifications({ pendingSessionComplete: false, items: [] })
-    queryClient.cancelQueries()
-    queryClient.clear()
-    navigate('/login')
-  }
+  const endSession = useEndSession()
 
   const { mutate, isPending } = useMutation({
-    mutationFn: logout,
-    onSuccess: resetAndRedirect,
-    onError: resetAndRedirect,
+    mutationFn: () => endSession(),
   })
 
   return (
