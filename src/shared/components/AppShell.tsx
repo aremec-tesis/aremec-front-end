@@ -4,9 +4,11 @@ import { useAppStore } from '../../store/app.store'
 import { ActiveSessionBanner } from '../../features/sessions/components/ActiveSessionBanner'
 import { SessionCompletionToast } from '../../features/sessions/components/SessionCompletionToast'
 import { Topbar } from './Topbar'
+import { useIdleLogout } from '../../features/auth/hooks/useIdleLogout'
 
 export default function AppShell() {
   const activePatientId = useAppStore((s) => s.activeSession.patientId)
+  useIdleLogout()
 
   return (
     <div className="app-shell">
