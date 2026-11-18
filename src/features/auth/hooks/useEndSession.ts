@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQueryClient } from '@tanstack/react-query'
 import { logout } from '../../../services/auth.service'
 import { useAppStore } from '../../../store/app.store'
+import { clearTrustedSession } from '../sessionGuard'
 
 /**
  * Ends the neurologist's session: asks the backend to expire the HttpOnly
@@ -21,6 +22,7 @@ export function useEndSession() {
         // Cookie may already be expired/absent — proceed with local teardown.
       }
 
+      clearTrustedSession()
       const { setAuth, resetActiveSession, setNotifications } = useAppStore.getState()
       setAuth({ neurologist: null, status: 'unauthenticated' })
       resetActiveSession()

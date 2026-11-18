@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom'
 import { AlertCircle, Clock } from 'lucide-react'
 import { resolveLoginNotice } from '../loginMessages'
+import { markLoginStarted } from '../sessionGuard'
 
 export default function LoginPage() {
   const apiBase = import.meta.env.VITE_API_BASE_URL as string | undefined
@@ -35,6 +36,7 @@ export default function LoginPage() {
             style={{ width: '100%' }}
             disabled={!apiBase}
             onClick={() => {
+              markLoginStarted()
               window.location.href = `${apiBase}/auth/login`
             }}
           >
